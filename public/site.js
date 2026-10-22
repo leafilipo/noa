@@ -150,6 +150,8 @@
         return `<div class="nf-notes nf-side-${esc(side)}">${side === "left" ? img : ""}<div class="nf-notes-t">${f(p + ".label", "p", "nf-lab nf-acc")}${fm(p + ".body", "nf-body")}</div>${side === "right" ? img : ""}</div>`; },
       // ---- noa: the coloured contact block ----
       hello: (p, s) => `<div class="nf-hello">${f(p + ".label", "p", "nf-lab")}${f(p + ".title", "h2", "nf-hello-t")}<a class="nf-hello-a" href="mailto:${esc(get(V, p + ".email"))}"><span data-f="${esc(p)}.email">${esc(get(V, p + ".email"))}</span></a></div>`,
+      // ---- noa: a minimal profile. One statement, then labelled lists separated by thin rules. ----
+      profile: (p, s) => `<div class="nf-prof">${fm(p + ".statement", "nf-prof-st")}<div class="nf-prof-rows">${items(p + ".rows", (q, i, row) => `${f(q + ".k", "p", "nf-lab nf-prof-k")}<div class="nf-prof-v">${items(q + ".items", (r, j, it) => (it && it.href) || E ? link(r, "nf-prof-a", "") : f(r + ".label", "span"), "plink", "nf-prof-i")}</div>`, "prow", "nf-prof-row")}</div></div>`,
       legal: (p, s) => `<div class="hs-card hs-textcard">${f(p + ".title", "h1", "hs-h2")}${fm(p + ".body", "hs-body hs-legal")}</div>`
     };
 
@@ -242,10 +244,12 @@
     specimens: { name: "Specimens", note: "The work as field guide cards", make: () => ({ t: "specimens", title: "Specimens", intro: "Creatures, systems and instruments, found so far." }) },
     notes: { name: "Notes", note: "Label, paragraphs and a tilted image", opts: [["side", "Image", "right"]], make: () => ({ t: "notes", side: "right", label: "Label", body: ["A paragraph."], img: "" }) },
     hello: { name: "Hello", note: "Coloured contact block", make: () => ({ t: "hello", label: "Contact", title: "Write to me.", email: "lea@huit.studio" }) },
+    profile: { name: "Profile", note: "Statement and labelled lists", make: () => ({ t: "profile", statement: ["A short statement."], rows: [{ k: "Label", items: [{ label: "Item", href: "" }] }] }) },
     legal: { name: "Legal text", note: "Imprint, privacy", make: () => ({ t: "legal", title: "Title", body: ["Text."] }) }
   };
   const ITEM = {
     mod: k => ({ text: { kind: "text", k: "Label", t: "Text", size: "1", tone: "card" }, work: { kind: "work", k: "Project", case: "", size: "1", tone: "tint" }, service: { kind: "service", k: "Services", t: "Strategy", size: "1", tone: "card" }, sketch: { kind: "sketch", k: "Experiment", variant: "waves", size: "1", tone: "card" }, clock: { kind: "clock", k: "Berlin", size: "1", tone: "card" }, contact: { kind: "contact", k: "Say hello", size: "2", tone: "ink" }, quote: { kind: "quote", k: "Said about us", t: "“A quote.”", size: "2", tone: "card" }, image: { kind: "image", k: "", img: "", size: "1", tone: "tint" } }[k] || { kind: "text", k: "", t: "", size: "1", tone: "card" }),
+    plink: () => ({ label: "Item", href: "" }), prow: () => ({ k: "Label", items: [{ label: "Item", href: "" }] }),
     word: () => "Tag", card: () => ({ title: "Title", tags: ["Tag"] }), group: () => ({ name: "New tab", items: [] }),
     pack: () => ({ title: "Package", price: "Starting price", text: "What it is for.", cta: "", link: { label: "Get a quote", href: "/start" } }),
     step: () => ({ title: "Step", text: "Short text.", out: "" }),
@@ -265,13 +269,8 @@
     pages: {
       home: { path: "/", title: "noa · experimental and speculative design, Berlin", desc: "Creatures, systems and instruments by noa, an experimental digital artist in Berlin.", sections: [
         LIB.creature.make(), LIB.specimens.make() ] },
-      about: { path: "/about", title: "About · noa", desc: "noa is an experimental digital artist in Berlin: creatures, systems and small instruments.", sections: [
-        {"t": "notes", "side": "left", "label": "Hello", "img": "", "body": ["I’m noa, an experimental digital artist in Berlin.", "I make creatures, systems and small instruments, and let them loose on the web. Some follow you around, some blink, some just want to be fed."]},
-        {"t": "notes", "side": "right", "label": "What I keep coming back to", "img": "", "body": ["Eyes. Skeletons. Blue skies with clouds. Geometry, repeated until it starts to feel alive.", "Most of what lives here is some mix of those."]},
-        {"t": "notes", "side": "none", "label": "Speculative", "body": ["I like designing for worlds that don’t exist yet. Everything here is treated as a real specimen, with a field guide entry, a habitat and a behaviour, as if someone had found it and written it down."]},
-        {"t": "notes", "side": "none", "label": "Experimental", "body": ["Nothing here is finished. Things get fed, renamed and broken. The site is the sketchbook and the exhibition at the same time."]},
-        {"t": "notes", "side": "none", "label": "Also", "body": ["By day I’m a product and brand designer and run Studio Huit. This is the other half."]},
-        {"t": "hello", "label": "Contact", "title": "Say hi.", "email": "lea@huit.studio"} ] },
+      about: { path: "/about", title: "About · noa", desc: "noa is an experimental digital artist in Berlin, making creatures, systems and small instruments for the web.", sections: [
+        {"t": "profile", "statement": ["noa is an experimental digital artist in Berlin, making creatures, systems and small instruments for the web."], "rows": [{"k": "Practice", "items": [{"label": "Interactive pieces", "href": ""}, {"label": "Generative systems", "href": ""}, {"label": "Speculative design", "href": ""}, {"label": "Instruments", "href": "/tools"}]}, {"k": "Motifs", "items": [{"label": "Eyes", "href": ""}, {"label": "Skeletons", "href": ""}, {"label": "Skies and clouds", "href": ""}, {"label": "Repetition", "href": ""}]}, {"k": "Specimens", "items": [{"label": "The worm", "href": "/work/the-worm"}, {"label": "Sky watchers", "href": "/work/sky-watchers"}, {"label": "Sky spine", "href": "/work/sky-spine"}, {"label": "Eye mandala", "href": "/work/eye-mandala"}, {"label": "Field", "href": "/work/field"}, {"label": "Instrument no. 1", "href": "/work/instrument-no-1"}]}, {"k": "Also", "items": [{"label": "Founder, Studio Huit", "href": "https://huit.studio"}, {"label": "Previously Head of Design, Glassnode", "href": ""}, {"label": "Previously Art Director, Gnosis", "href": ""}]}, {"k": "Elsewhere", "items": [{"label": "Instagram", "href": "https://www.instagram.com/"}, {"label": "X", "href": "https://x.com/"}]}, {"k": "Contact", "items": [{"label": "lea@huit.studio", "href": "mailto:lea@huit.studio"}]}]} ] },
       tools: { path: "/tools", title: "Tools · noa", desc: "Instruments noa built for herself. Some are free to play with.", sections: [
         { t: "tools", title: "Instruments", intro: "Small tools I built for myself. Some are free to play with.", items: [
           { name: "Instrument no. 1", text: "A pendulum drawing machine. Every visit draws something new.", price: "", period: "free", status: "live", img: "", custom: "", buy: { label: "", href: "" }, try: { label: "Play", href: "" }, wait: { label: "", href: "" } },

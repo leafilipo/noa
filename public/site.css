@@ -450,3 +450,17 @@ body[data-device="phone"] .hs { position: relative; } body[data-device="phone"] 
   .nf-where { display: none; }
   .nf-fg { top: auto; bottom: 64px; transform: none; }
 }
+
+/* about: profile */
+.hs-sec-profile { max-width: 1180px; width: 100%; margin-inline: auto; }
+.nf-prof { padding-block: clamp(48px, 9cqi, 140px) clamp(24px, 4cqi, 64px); display: flex; flex-direction: column; gap: clamp(48px, 7cqi, 112px); }
+.nf-prof-st { font-size: clamp(28px, 3.3cqi, 48px); line-height: 1.12; letter-spacing: -.025em; font-weight: 400; max-width: 22ch; text-wrap: balance; }
+.nf-prof-rows { border-bottom: 1px solid var(--line); }
+.nf-prof-row { display: grid; grid-template-columns: minmax(140px, 1fr) 3fr; gap: 16px 24px; padding: 18px 0 20px; border-top: 1px solid var(--line); position: relative; }
+.nf-prof-k { color: var(--mut); padding-top: 4px; }
+.nf-prof-v { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 6px 24px; font-size: 17px; line-height: 1.4; }
+.nf-prof-i { position: relative; }
+.nf-prof-a { transition: color .2s; }
+.nf-prof-a:hover { color: var(--accent); }
+.nf-prof-v .st-add { justify-self: start; }
+@media (max-width: 720px) { .nf-prof-row { grid-template-columns: 1fr; gap: 8px; } }
