@@ -397,7 +397,10 @@ body[data-device="phone"] .hs { position: relative; } body[data-device="phone"] 
 .nf-where { justify-self: end; color: var(--mut); font-variant-numeric: tabular-nums; }
 /* a small live counter in the bottom right: what he has eaten */
 /* corner widgets: small paper cards, ink lines */
-.nf-w { position: absolute; z-index: 6; display: flex; align-items: center; gap: 12px; padding: 10px 14px 10px 12px; border-radius: 14px; background: color-mix(in srgb, #FFFFFF 22%, var(--bg)); box-shadow: 0 1px 0 color-mix(in srgb, var(--ink) 10%, transparent), 0 14px 30px rgba(0,0,0,.08); font-size: 13px; line-height: 1.25; pointer-events: none; font-variant-numeric: tabular-nums; }
+.nf-wc { position: absolute; z-index: 6; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
+.nf-wc.nf-w-tr, .nf-wc.nf-w-br { align-items: flex-end; }
+.nf-wc.nf-w-bl, .nf-wc.nf-w-br { flex-direction: column-reverse; }
+.nf-w { position: relative; display: flex; align-items: center; gap: 12px; padding: 10px 14px 10px 12px; border-radius: 14px; background: color-mix(in srgb, #FFFFFF 22%, var(--bg)); box-shadow: 0 1px 0 color-mix(in srgb, var(--ink) 10%, transparent), 0 14px 30px rgba(0,0,0,.08); font-size: 13px; line-height: 1.25; pointer-events: none; font-variant-numeric: tabular-nums; }
 .hs.dark .nf-w { background: color-mix(in srgb, #FFFFFF 6%, var(--bg)); }
 .nf-w-tl { left: var(--pad); top: 76px; } .nf-w-tr { right: var(--pad); top: 76px; } .nf-w-bl { left: var(--pad); bottom: var(--pad); } .nf-w-br { right: var(--pad); bottom: var(--pad); }
 .nf-w-t { display: flex; flex-direction: column; gap: 2px; }
@@ -421,7 +424,7 @@ body[data-device="phone"] .hs { position: relative; } body[data-device="phone"] 
 .nf-pill:hover a.on:not(.lit) { color: var(--ink); }
 .nf-pill a.nf-face { display: inline-grid; place-items: center; padding: 6px 12px; }
 .nf-pill a.nf-face > span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
-.nf-face-svg { width: 24px; height: 24px; display: block; --face-ink: var(--ink); --face-paper: #E7E1DE; }
+.nf-face-svg { width: 26px; height: 26px; display: block; --face-ink: var(--ink); --face-paper: #E7E1DE; }
 .hs.dark .nf-face-svg { --face-ink: #1A1A1A; --face-paper: #E7E1DE; }
 .st-editing .nf-pill a.nf-face > span { position: static; width: auto; height: auto; clip: auto; margin-left: 8px; }
 .hs-sec-creature { margin-top: calc(-1 * (var(--gap) + 52px)); margin-inline: calc(-1 * var(--pad)); }
@@ -546,3 +549,13 @@ body[data-device="phone"] .hs { position: relative; } body[data-device="phone"] 
 .nf-btn:hover { background: transparent; color: var(--ink); }
 .hs-form-msg:empty { display: none; }
 @container hs (max-width: 720px) { .nf-write { grid-template-columns: 1fr; } .nf-write-t, .nf-form { grid-column: 1; } .nf-form { grid-template-columns: 1fr; } }
+
+/* music widget: four bars that dance, a link out */
+.nf-eq { display: flex; align-items: flex-end; gap: 3px; width: 22px; height: 22px; flex: none; padding: 0 4px; }
+.nf-eq i { flex: 1; background: var(--ink); border-radius: 1px; height: 30%; animation: nf-eq 1.1s ease-in-out infinite; }
+.nf-eq i:nth-child(2) { animation-delay: -.4s; animation-duration: .9s; } .nf-eq i:nth-child(3) { animation-delay: -.7s; animation-duration: 1.3s; } .nf-eq i:nth-child(4) { animation-delay: -.2s; animation-duration: 1s; }
+@keyframes nf-eq { 0%, 100% { height: 25%; } 50% { height: 100%; } }
+@media (prefers-reduced-motion: reduce) { .nf-eq i { animation: none; height: 60%; } }
+.nf-w-music { pointer-events: auto; }
+.nf-w-link { margin-left: 4px; width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; background: var(--ink); color: var(--bg); font-size: 13px; text-decoration: none; transition: transform .25s; }
+.nf-w-link:hover { transform: rotate(45deg); }
