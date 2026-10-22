@@ -24,6 +24,7 @@
   document.querySelectorAll("[data-theme]").forEach(b => b.addEventListener("click", () => { dark = site.classList.contains("dark") ? "0" : "1"; try { localStorage.setItem("hs-dark", dark); } catch (e) {} apply(); }));
   // bench: visitors rearrange the grid; it resets on reload
   document.querySelectorAll("[data-bench]").forEach(g => window.HS && window.HS.bench(g));
+  document.querySelectorAll("[data-gallery]").forEach(r => window.HS && window.HS.gallery(r));
   document.querySelectorAll("[data-creature]").forEach(r => window.HS && window.HS.creature(r));
   document.querySelectorAll("[data-estimate]").forEach(r => window.HS && window.HS.estimate(r));
   // cookie banner: show once, remember the answer; "No counting" switches the view counter off in this browser

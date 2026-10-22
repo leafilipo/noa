@@ -152,6 +152,15 @@
       hello: (p, s) => `<div class="nf-hello">${f(p + ".label", "p", "nf-lab")}${f(p + ".title", "h2", "nf-hello-t")}<a class="nf-hello-a" href="mailto:${esc(get(V, p + ".email"))}"><span data-f="${esc(p)}.email">${esc(get(V, p + ".email"))}</span></a></div>`,
       // ---- noa: a minimal profile. One statement, then labelled lists separated by thin rules. ----
       profile: (p, s) => `<div class="nf-prof">${fm(p + ".statement", "nf-prof-st")}<div class="nf-prof-rows">${items(p + ".rows", (q, i, row) => `${f(q + ".k", "p", "nf-lab nf-prof-k")}<div class="nf-prof-v">${items(q + ".items", (r, j, it) => (it && it.href) || E ? link(r, "nf-prof-a", "") : f(r + ".label", "span"), "plink", "nf-prof-i")}</div>`, "prow", "nf-prof-row")}</div></div>`,
+      // ---- noa: the gallery. Everything in one grid, filtered by kind. ----
+      gallery: (p, s) => { const arr = get(V, p + ".items") || [], order = ["specimen", "snapshot", "sketch", "instrument"];
+        const kinds = [...new Set(arr.map(it => String(it.kind || "").trim().toLowerCase()).filter(Boolean))].sort((a, b) => (order.indexOf(a) + 1 || 99) - (order.indexOf(b) + 1 || 99));
+        const card = (q, i, it) => { const inner = `<div class="nf-g-img" style="aspect-ratio:${["4 / 5", "1 / 1", "4 / 3", "3 / 4"][i % 4]}">${it.img ? `<img src="${esc(src(it.img))}" alt="" loading="lazy">` : specArt(i)}${E ? media(q + ".img", "nf-g-media", false) : ""}</div>
+            <div class="nf-g-meta">${f(q + ".title", "b")}<span class="nf-lab nf-mut">${f(q + ".kind", "span")}${it.year || E ? ` · ${f(q + ".year", "span")}` : ""}</span></div>`;
+          return it.href && !E ? `<a href="${esc(it.href)}" class="nf-g-link">${inner}</a>` : inner; };
+        return `<div class="nf-gal" data-gallery><div class="nf-g-filters" role="group" aria-label="Filter"><button type="button" class="on" data-gf="">all <span class="nf-mut">${arr.length}</span></button>${kinds.map(k => `<button type="button" data-gf="${esc(k)}">${esc(k)} <span class="nf-mut">${arr.filter(it => String(it.kind || "").trim().toLowerCase() === k).length}</span></button>`).join("")}</div>
+          <div class="nf-g-grid">${arr.map((it, i) => `<div class="hs-item nf-g-item" data-item="${esc(p)}.items.${i}" data-kind="${esc(String(it.kind || "").trim().toLowerCase())}">${card(`${p}.items.${i}`, i, it)}${E ? `<button type="button" class="st-x" data-del="${esc(p)}.items.${i}" title="Remove">×</button>` : ""}</div>`).join("")}</div>
+          ${E ? `<button type="button" class="st-add" data-add="${esc(p)}.items" data-kind="gitem">+ Add to gallery</button>` : ""}</div>`; },
       legal: (p, s) => `<div class="hs-card hs-textcard">${f(p + ".title", "h1", "hs-h2")}${fm(p + ".body", "hs-body hs-legal")}</div>`
     };
 
@@ -245,10 +254,12 @@
     notes: { name: "Notes", note: "Label, paragraphs and a tilted image", opts: [["side", "Image", "right"]], make: () => ({ t: "notes", side: "right", label: "Label", body: ["A paragraph."], img: "" }) },
     hello: { name: "Hello", note: "Coloured contact block", make: () => ({ t: "hello", label: "Contact", title: "Write to me.", email: "lea@huit.studio" }) },
     profile: { name: "Profile", note: "Statement and labelled lists", make: () => ({ t: "profile", statement: ["A short statement."], rows: [{ k: "Label", items: [{ label: "Item", href: "" }] }] }) },
+    gallery: { name: "Gallery", note: "Everything in one grid with filters", make: () => ({ t: "gallery", items: [{ title: "Untitled", kind: "snapshot", year: "2026", img: "", href: "" }] }) },
     legal: { name: "Legal text", note: "Imprint, privacy", make: () => ({ t: "legal", title: "Title", body: ["Text."] }) }
   };
   const ITEM = {
     mod: k => ({ text: { kind: "text", k: "Label", t: "Text", size: "1", tone: "card" }, work: { kind: "work", k: "Project", case: "", size: "1", tone: "tint" }, service: { kind: "service", k: "Services", t: "Strategy", size: "1", tone: "card" }, sketch: { kind: "sketch", k: "Experiment", variant: "waves", size: "1", tone: "card" }, clock: { kind: "clock", k: "Berlin", size: "1", tone: "card" }, contact: { kind: "contact", k: "Say hello", size: "2", tone: "ink" }, quote: { kind: "quote", k: "Said about us", t: "“A quote.”", size: "2", tone: "card" }, image: { kind: "image", k: "", img: "", size: "1", tone: "tint" } }[k] || { kind: "text", k: "", t: "", size: "1", tone: "card" }),
+    gitem: () => ({ title: "Untitled", kind: "snapshot", year: "2026", img: "", href: "" }),
     plink: () => ({ label: "Item", href: "" }), prow: () => ({ k: "Label", items: [{ label: "Item", href: "" }] }),
     word: () => "Tag", card: () => ({ title: "Title", tags: ["Tag"] }), group: () => ({ name: "New tab", items: [] }),
     pack: () => ({ title: "Package", price: "Starting price", text: "What it is for.", cta: "", link: { label: "Get a quote", href: "/start" } }),
@@ -263,7 +274,7 @@
     sections: [{ t: "image", img: "", caption: "" }, { t: "pair", a: "", b: "" }, { t: "facts", items: [{ k: "Medium", v: "[code, 3D, motion]" }, { k: "Year", v: "2026" }] }] });
   const SEED = {
     name: "V1",
-    site: { name: "noa", navStyle: "noa", email: "lea@huit.studio", city: "Berlin", tz: "Europe/Berlin", nav: [{ label: "work", href: "/" }, { label: "about", href: "/about" }, { label: "tools", href: "/tools" }],
+    site: { name: "noa", navStyle: "noa", email: "lea@huit.studio", city: "Berlin", tz: "Europe/Berlin", nav: [{ label: "work", href: "/" }, { label: "about", href: "/about" }, { label: "gallery", href: "/gallery" }],
       consent: { on: true, text: "This site sets no tracking cookies. It counts page views without identifying you.", accept: "Fine", decline: "No counting", more: "/cookies", moreLabel: "Cookies" },
       social: [{ label: "Instagram", href: "https://www.instagram.com/" }, { label: "X", href: "https://x.com/" }] },
     pages: {
@@ -271,11 +282,7 @@
         LIB.creature.make(), LIB.specimens.make() ] },
       about: { path: "/about", title: "About · noa", desc: "noa is an experimental digital artist in Berlin, making creatures, systems and small instruments for the web.", sections: [
         {"t": "profile", "statement": ["noa is an experimental digital artist in Berlin, making creatures, systems and small instruments for the web."], "rows": [{"k": "Practice", "items": [{"label": "Interactive pieces", "href": ""}, {"label": "Generative systems", "href": ""}, {"label": "Speculative design", "href": ""}, {"label": "Instruments", "href": "/tools"}]}, {"k": "Also", "items": [{"label": "Founder, Studio Huit", "href": "https://huit.studio"}, {"label": "Previously Head of Design, Glassnode", "href": ""}, {"label": "Previously Art Director, Gnosis", "href": ""}]}, {"k": "Elsewhere", "items": [{"label": "Instagram", "href": "https://www.instagram.com/"}, {"label": "X", "href": "https://x.com/"}]}, {"k": "Contact", "items": [{"label": "lea@huit.studio", "href": "mailto:lea@huit.studio"}]}]} ] },
-      tools: { path: "/tools", title: "Tools · noa", desc: "Instruments noa built for herself. Some are free to play with.", sections: [
-        { t: "tools", title: "Instruments", intro: "Small tools I built for myself. Some are free to play with.", items: [
-          { name: "Instrument no. 1", text: "A pendulum drawing machine. Every visit draws something new.", price: "", period: "free", status: "live", img: "", custom: "", buy: { label: "", href: "" }, try: { label: "Play", href: "" }, wait: { label: "", href: "" } },
-          { name: "Field", text: "Particles in a noise field. Your cursor makes a vortex.", price: "", period: "free", status: "live", img: "", custom: "", buy: { label: "", href: "" }, try: { label: "Play", href: "" }, wait: { label: "", href: "" } },
-          { name: "[Next instrument]", text: "[What it does, in one line.]", price: "", period: "", status: "soon", img: "", custom: "", buy: { label: "", href: "" }, try: { label: "", href: "" }, wait: { label: "Tell me when", href: "mailto:lea@huit.studio?subject=Tell%20me%20when" } } ] } ] },
+      gallery: {"path": "/gallery", "title": "Gallery · noa", "desc": "Specimens, snapshots, sketches and instruments by noa.", "sections": [{"t": "gallery", "items": [{"title": "The worm", "kind": "specimen", "year": "2026", "img": "", "href": "/work/the-worm"}, {"title": "[Snapshot]", "kind": "snapshot", "year": "2026", "img": "", "href": ""}, {"title": "Sky watchers", "kind": "specimen", "year": "2026", "img": "", "href": "/work/sky-watchers"}, {"title": "Instrument no. 1", "kind": "instrument", "year": "2026", "img": "", "href": "/work/instrument-no-1"}, {"title": "[Sketch]", "kind": "sketch", "year": "2026", "img": "", "href": ""}, {"title": "Sky spine", "kind": "specimen", "year": "2026", "img": "", "href": "/work/sky-spine"}, {"title": "[Snapshot]", "kind": "snapshot", "year": "2026", "img": "", "href": ""}, {"title": "Eye mandala", "kind": "specimen", "year": "2026", "img": "", "href": "/work/eye-mandala"}, {"title": "Field", "kind": "instrument", "year": "2026", "img": "", "href": "/work/field"}, {"title": "[Sketch]", "kind": "sketch", "year": "2026", "img": "", "href": ""}, {"title": "[Snapshot]", "kind": "snapshot", "year": "2026", "img": "", "href": ""}]}]},
       imprint: { path: "/imprint", title: "Imprint · noa", desc: "Imprint", sections: [{ t: "legal", title: "Imprint", body: ["[Full legal name]", "[Street and number]", "[Postcode] Berlin, Germany", "Email: lea@huit.studio"] }] },
       privacy: { path: "/privacy", title: "Privacy · noa", desc: "How this website handles personal data.", sections: [{ t: "legal", title: "Privacy", body: [
         "Responsible for this website: [full legal name], [address], lea@huit.studio.",
@@ -361,16 +368,16 @@
     const cv = root.querySelector("canvas"), card = root.querySelector(".nf-fg"), cap = root.querySelector(".nf-cap > span");
     if (!cv || cv.dataset.on) return; cv.dataset.on = "1";
     const ctx = cv.getContext("2d"), reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
-    let W = 0, H = 0, k = 1, N = 220, head = null, trail = [], snacks = [], eaten = 0, gulp = -9, nextBlink = 2, raf = 0, pts = [];
+    let W = 0, H = 0, k = 1, N = 300, head = null, trail = [], snacks = [], eaten = 0, gulp = -9, nextBlink = 2, raf = 0, pts = [];
     const m = { x: 0, y: 0, at: -1e9 }, edit = !!root.closest(".st-editing"), base = cap ? cap.textContent : "";
     const col = n => getComputedStyle(root).getPropertyValue(n).trim();
     function fit() {
       const r = root.getBoundingClientRect(), d = devicePixelRatio || 1; W = r.width; H = r.height; if (!W || !H) return;
       cv.width = W * d; cv.height = H * d; ctx.setTransform(d, 0, 0, d, 0, 0); k = Math.max(.55, Math.min(1.2, Math.min(W / 1440, H / 860)));
-      if (!head) { head = { x: W * .3, y: H * .5, a: 0 }; trail = []; for (let i = 0; i < 1500; i++) trail.push({ x: head.x - i * 2, y: head.y + Math.sin(i * .02) * 40 }); }
+      if (!head) { head = { x: W * .3, y: H * .5, a: 0 }; trail = []; for (let i = 0; i < 4000; i++) trail.push({ x: head.x - Math.sin(i * .004) * W * .25, y: head.y + Math.sin(i * .007) * H * .25 }); }
     }
     const ro = new ResizeObserver(fit); ro.observe(root); fit();
-    const radius = (i, n) => { const T = 28 * k, u = i / n; if (i < 10) return T * (.62 + i * .038); if (u < .55) return T; return T * Math.pow(1 - (u - .55) / .45, 1.25) + 2.5 * k; };
+    const radius = (i, n) => { const T = 30 * k, u = i / n; if (i < 16) return T * (.58 + i * .026); if (u < .42) return T; return T * Math.pow(1 - (u - .42) / .58, 1.6) + 2 * k; };
     const pos = e => { const r = cv.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; };
     cv.addEventListener("pointermove", e => { const q = pos(e); m.x = q.x; m.y = q.y; m.at = performance.now(); });
     cv.addEventListener("click", e => {
@@ -387,25 +394,25 @@
       if (snacks.length) { let best = null, bd = 1e9; for (const s of snacks) { const d = Math.hypot(s.x - head.x, s.y - head.y); if (d < bd) { bd = d; best = s; } } tx = best.x; ty = best.y; chasing = true;
         if (bd < 22 * k) { snacks.splice(snacks.indexOf(best), 1); eaten++; N += 18; gulp = t; if (cap) cap.textContent = base.replace(/he is .*$/, "") + `he has eaten ${eaten} ${eaten === 1 ? "snack" : "snacks"}.`; } }
       else if (ms - m.at < 2500) { tx = m.x; ty = m.y; }
-      else { tx = W / 2 + Math.cos(t * .37) * W * .3 + Math.sin(t * .91) * W * .08; ty = H / 2 + Math.sin(t * .53) * H * .3; }
+      else { tx = W / 2 + Math.cos(t * .21) * W * .34 + Math.sin(t * .47) * W * .06; ty = H / 2 + Math.sin(t * .33) * H * .32 + Math.cos(t * .61) * H * .05; }
       if (!reduce) {
         const want = Math.atan2(ty - head.y, tx - head.x); let da = want - head.a; while (da > Math.PI) da -= Math.PI * 2; while (da < -Math.PI) da += Math.PI * 2;
-        const dist = Math.hypot(tx - head.x, ty - head.y), sp = (chasing ? 4.2 : 2.8) * k * Math.min(1, dist / (60 * k) + .25);
-        head.a += Math.max(-.055, Math.min(.055, da)) + Math.sin(t * 2.2) * .012; head.x += Math.cos(head.a) * sp; head.y += Math.sin(head.a) * sp;
-        if (Math.hypot(head.x - trail[0].x, head.y - trail[0].y) > .8) trail.unshift({ x: head.x, y: head.y }); if (trail.length > 9000) trail.length = 9000;
+        const dist = Math.hypot(tx - head.x, ty - head.y), sp = (chasing ? 3.6 : 2.1) * k * Math.min(1, dist / (80 * k) + .3);
+        head.a += Math.max(-.032, Math.min(.032, da)); head.x += Math.cos(head.a) * sp; head.y += Math.sin(head.a) * sp;
+        if (Math.hypot(head.x - trail[0].x, head.y - trail[0].y) > .8) trail.unshift({ x: head.x, y: head.y }); if (trail.length > 14000) trail.length = 14000;
       }
       pts = []; let acc = 0, need = 0, i = 0;
       for (let j = 1; j < trail.length && i < N; j++) { const a = trail[j - 1], b = trail[j], seg = Math.hypot(b.x - a.x, b.y - a.y);
-        while (acc + seg >= need && i < N) { const f = (need - acc) / (seg || 1), r = radius(i, N); pts.push({ x: a.x + (b.x - a.x) * f, y: a.y + (b.y - a.y) * f, r }); i++; need += r < 9 * k ? r * 2.3 : 3.6 * k; } acc += seg; }
+        while (acc + seg >= need && i < N) { const f = (need - acc) / (seg || 1), r = radius(i, N); pts.push({ x: a.x + (b.x - a.x) * f, y: a.y + (b.y - a.y) * f, r }); i++; need += r < 11 * k ? r * 2.1 : Math.max(3 * k, r * .2); } acc += seg; }
       ctx.clearRect(0, 0, W, H);
       for (const s of snacks) { const w = 1 + Math.sin(t * 6 + s.b) * .15; ctx.fillStyle = ink; ctx.beginPath(); ctx.arc(s.x, s.y, 5 * k * w, 0, 7); ctx.fill(); ctx.strokeStyle = ink; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(s.x, s.y, 11 * k * w, 0, 7); ctx.stroke(); }
-      ctx.lineWidth = 2.2 * k; ctx.strokeStyle = ink;
+      ctx.lineWidth = 1.5 * k; ctx.strokeStyle = ink;
       const gf = Math.max(0, 1 - (t - gulp) * 1.2), bulge = gf > 0 ? (1 - gf) * pts.length : -999;
       for (let q = pts.length - 1; q >= 0; q--) { const p = pts[q], bump = 1 + Math.max(0, 1 - Math.abs(q - bulge) / 8) * .35; ctx.fillStyle = paper; ctx.beginPath(); ctx.arc(p.x, p.y, p.r * bump, 0, 7); ctx.fill(); ctx.stroke(); }
       const hp = pts[0];
       if (hp) { const r = hp.r, cx = hp.x + Math.cos(head.a) * r * .18, cy = hp.y + Math.sin(head.a) * r * .18;
         if (t > nextBlink + .16) nextBlink = t + 2 + Math.random() * 5; const bl = t > nextBlink;
-        ctx.fillStyle = ink; ctx.lineWidth = 2 * k;
+        ctx.fillStyle = ink; ctx.lineWidth = 1.5 * k;
         for (const s of [-1, 1]) { const ex = cx + s * r * .32, ey = cy - r * .22; if (bl) { ctx.beginPath(); ctx.moveTo(ex - r * .1, ey); ctx.lineTo(ex + r * .1, ey); ctx.stroke(); } else { ctx.beginPath(); ctx.ellipse(ex, ey, r * .09, r * .13, 0, 0, 7); ctx.fill(); } }
         ctx.beginPath(); ctx.arc(cx, cy + r * .05, r * .36, .15 * Math.PI, .85 * Math.PI); ctx.stroke();
         ctx.beginPath(); ctx.ellipse(cx + r * .08 + Math.sin(t * 7) * r * .06, cy + r * .48, r * .13, r * (chasing ? .5 : .3) * .45, .2, 0, 7); ctx.fill(); }
@@ -413,5 +420,10 @@
     }
     raf = requestAnimationFrame(step); creatures.push({ stop: () => cancelAnimationFrame(raf) });
   }
-  window.HS = { creature, creatures, make, LIB, ITEM, SEED, newCase, routes, get, esc, slugify, src, bench, estimate };
+  // gallery filter: chips show one kind at a time
+  function gallery(root) { if (root.dataset.on) return; root.dataset.on = "1";
+    root.addEventListener("click", e => { const b = e.target.closest("[data-gf]"); if (!b) return; const k = b.dataset.gf;
+      root.querySelectorAll("[data-gf]").forEach(x => x.classList.toggle("on", x === b));
+      root.querySelectorAll(".nf-g-item").forEach(it => { it.hidden = !!k && it.dataset.kind !== k; }); }); }
+  window.HS = { gallery, creature, creatures, make, LIB, ITEM, SEED, newCase, routes, get, esc, slugify, src, bench, estimate };
 })();
