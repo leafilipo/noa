@@ -17,6 +17,8 @@
     for (let j = n - 1; j >= 0; j--) { const u = j / n, x = 20 + u * 160, y = 100 + Math.sin(u * Math.PI * a * 2 + ph) * 46 * Math.sin(u * Math.PI), r = 6 + 12 * Math.sin(u * Math.PI) * (1 - u * .4);
       s += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${r.toFixed(1)}"/>`; }
     return `<svg class="nf-art" viewBox="0 0 200 200" aria-hidden="true">${s}</svg>`; };
+  // gallery placeholders until real images: soft gradients in the site's inks and skies
+  const GRAD = ["linear-gradient(160deg,#1E63D8,#A9D2F7)", "linear-gradient(20deg,#1A1A1A,#5E5B55)", "radial-gradient(circle at 30% 30%,#FFFFFF,#A9D2F7 60%,#1E63D8)", "linear-gradient(200deg,#F3F1EA,#C9C3BB)", "linear-gradient(135deg,#1B3FA0,#1E63D8 50%,#A9D2F7)", "radial-gradient(circle at 70% 70%,#5E5B55,#1A1A1A)", "linear-gradient(90deg,#DCD8D3,#1E63D8)", "conic-gradient(from 200deg,#A9D2F7,#1E63D8,#1B3FA0,#A9D2F7)", "linear-gradient(180deg,#1A1A1A 40%,#DCD8D3 40%)", "radial-gradient(circle at 50% 100%,#F3F1EA,#DCD8D3 50%,#C9C3BB)", "linear-gradient(240deg,#1E63D8,#1A1A1A)"];
   function make(V, opts) {
     const E = !!(opts && opts.edit);
     const f = (path, tag, cls, attrs) => { const v = get(V, path); return `<${tag || "span"} class="${cls || ""}" data-f="${esc(path)}"${attrs || ""}>${esc(v)}</${tag || "span"}>`; };
@@ -155,7 +157,7 @@
       // ---- noa: the gallery. Everything in one grid, filtered by kind. ----
       gallery: (p, s) => { const arr = get(V, p + ".items") || [], order = ["specimen", "snapshot", "sketch", "instrument"];
         const kinds = [...new Set(arr.map(it => String(it.kind || "").trim().toLowerCase()).filter(Boolean))].sort((a, b) => (order.indexOf(a) + 1 || 99) - (order.indexOf(b) + 1 || 99));
-        const card = (q, i, it) => { const inner = `<div class="nf-g-img" style="aspect-ratio:${["4 / 5", "1 / 1", "4 / 3", "3 / 4"][i % 4]}">${it.img ? `<img src="${esc(src(it.img))}" alt="" loading="lazy">` : specArt(i)}${E ? media(q + ".img", "nf-g-media", false) : ""}</div>
+        const card = (q, i, it) => { const inner = `<div class="nf-g-img" style="aspect-ratio:${["4 / 5", "1 / 1", "4 / 3", "3 / 4"][i % 4]};--g:${GRAD[i % GRAD.length]}">${it.img ? `<img src="${esc(src(it.img))}" alt="" loading="lazy">` : ""}${E ? media(q + ".img", "nf-g-media", false) : ""}</div>
             <div class="nf-g-meta">${f(q + ".title", "b")}<span class="nf-lab nf-mut">${f(q + ".kind", "span")}${it.year || E ? ` · ${f(q + ".year", "span")}` : ""}</span></div>`;
           return it.href && !E ? `<a href="${esc(it.href)}" class="nf-g-link">${inner}</a>` : inner; };
         return `<div class="nf-gal" data-gallery><div class="nf-g-filters" role="group" aria-label="Filter"><button type="button" class="on" data-gf="">all <span class="nf-mut">${arr.length}</span></button>${kinds.map(k => `<button type="button" data-gf="${esc(k)}">${esc(k)} <span class="nf-mut">${arr.filter(it => String(it.kind || "").trim().toLowerCase() === k).length}</span></button>`).join("")}</div>
