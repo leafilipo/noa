@@ -138,7 +138,7 @@
     if (v === "site" || !loaded) { site.hidden = false; box.hidden = true; box.innerHTML = ""; return; }
     site.hidden = true; box.hidden = false;
     if (v === "posts" || v === "plan") { box.innerHTML = ""; if (window.HSP) window.HSP.render(box); return; }
-    if (v === "stats") { box.innerHTML = ""; if (window.HSP) window.HSP.analytics(box); return; }
+    if (v === "stats") { box.innerHTML = ""; if (window.HSA) window.HSA.analytics(box); return; }
     box.innerHTML = `<div class="st-vwrap">${v === "projects" ? viewProjects() : v === "tone" ? viewTone() : v === "brand" ? viewBrand() : viewRefs()}</div>`;
     box.querySelectorAll("textarea.st-doc").forEach(grow);
   }

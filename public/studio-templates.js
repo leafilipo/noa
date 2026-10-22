@@ -1,3 +1,4 @@
+window.HS_PLATFORMS = { linkedin: { name: "LinkedIn", url: "https://www.linkedin.com/", max: 3000, sizes: [["1200×627", 1200, 627], ["1080×1350", 1080, 1350]] }, instagram: { name: "Instagram", url: "https://www.instagram.com/", max: 2200, sizes: [["1080×1350", 1080, 1350], ["1080×1080", 1080, 1080], ["1080×1920", 1080, 1920]] }, x: { name: "X", url: "https://x.com/", max: 280, sizes: [["1600×900", 1600, 900], ["1080×1080", 1080, 1080]] } };
 // Content pillars and post templates. A pillar is a reason to post; every post carries one as a badge.
 window.HS_PILLARS = [
   { id: "sighting", name: "Sighting", color: "#1E63D8", text: "A new specimen: a creature, a system or an instrument. Show it moving." },
