@@ -386,7 +386,7 @@
     const cv = root.querySelector("canvas"), card = root.querySelector(".nf-fg"), cap = root.querySelector(".nf-cap > span"), cnt = root.querySelector(".nf-count");
     if (!cv || cv.dataset.on) return; cv.dataset.on = "1";
     const ctx = cv.getContext("2d"), reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
-    let this_face = null, W = 0, H = 0, k = 1, N = 380, head = null, trail = [], snacks = [], eaten = 0, gulp = -9, nextBlink = 2, raf = 0, pts = [];
+    let this_face = null, W = 0, H = 0, k = 1, N = 420, head = null, trail = [], snacks = [], eaten = 0, gulp = -9, nextBlink = 2, raf = 0, pts = [];
     const m = { x: 0, y: 0, at: -1e9 }, edit = !!root.closest(".st-editing"), base = cap ? cap.textContent : "";
     const col = n => getComputedStyle(root).getPropertyValue(n).trim();
     function fit() {
@@ -395,7 +395,7 @@
       if (!head) { head = { x: W * .3, y: H * .5, a: 0 }; trail = []; for (let i = 0; i < 4000; i++) trail.push({ x: head.x - Math.sin(i * .004) * W * .25, y: head.y + Math.sin(i * .007) * H * .25 }); }
     }
     const ro = new ResizeObserver(fit); ro.observe(root); fit();
-    const radius = (i, n) => { const T = 30 * k, u = i / n; if (u < .1) return T * (.72 + .28 * u / .1); if (u < .6) return T; return T * Math.pow(1 - (u - .6) / .4, 1.2) + 2 * k; };
+    const radius = (i, n) => { const T = 34 * k, u = i / n; if (u < .62) return T; return T * Math.pow(1 - (u - .62) / .38, 1.05) + 2 * k; };
     const pos = e => { const r = cv.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; };
     cv.addEventListener("pointermove", e => { const q = pos(e); m.x = q.x; m.y = q.y; m.at = performance.now(); });
     cv.addEventListener("click", e => {
@@ -416,11 +416,11 @@
       if (!reduce) {
         const want = Math.atan2(ty - head.y, tx - head.x); let da = want - head.a; while (da > Math.PI) da -= Math.PI * 2; while (da < -Math.PI) da += Math.PI * 2;
         const dist = Math.hypot(tx - head.x, ty - head.y), sp = (chasing ? 3.6 : 2.1) * k * Math.min(1, dist / (80 * k) + .3);
-        const M = 60 * k, R = 30 * k; let turn = Math.max(-.026, Math.min(.026, da)) + Math.sin(t * .9) * .004;
+        const M = 60 * k, R = 30 * k; let turn = Math.max(-.022, Math.min(.022, da));
         // near an edge: steer toward the centre, harder the closer he gets
         const ex = head.x < M ? (M - head.x) / M : head.x > W - M ? -(head.x - (W - M)) / M : 0, ey = head.y < M ? (M - head.y) / M : head.y > H - M ? -(head.y - (H - M)) / M : 0;
         if (ex || ey) { const wa = Math.atan2(ey || (H / 2 - head.y) / H, ex || (W / 2 - head.x) / W); let dd = wa - head.a; while (dd > Math.PI) dd -= Math.PI * 2; while (dd < -Math.PI) dd += Math.PI * 2; turn += Math.max(-.09, Math.min(.09, dd)) * Math.min(1, Math.hypot(ex, ey)); }
-        head.a += turn; head.x += Math.cos(head.a) * sp; head.y += Math.sin(head.a) * sp;
+        head.a += turn * .8; head.x += Math.cos(head.a) * sp; head.y += Math.sin(head.a) * sp;
         head.x = Math.max(R, Math.min(W - R, head.x)); head.y = Math.max(R, Math.min(H - R, head.y));
         if (Math.hypot(head.x - trail[0].x, head.y - trail[0].y) > .8) trail.unshift({ x: head.x, y: head.y }); if (trail.length > 20000) trail.length = 20000;
       }
@@ -430,7 +430,7 @@
           // dynamic spacing: rings pack tighter where the body bends (the rings on the inside of a curve almost touch)
           const prev = pts[i - 1]; let bend = 0; if (prev && prev.a != null) { const ang = Math.atan2(y - prev.y, x - prev.x); let d = ang - prev.a; while (d > Math.PI) d -= Math.PI * 2; while (d < -Math.PI) d += Math.PI * 2; bend = Math.min(1, Math.abs(d) * 6); }
           pts.push({ x, y, r, a: prev ? Math.atan2(y - prev.y, x - prev.x) : head.a }); i++;
-          const base = r < 11 * k ? r * 2 : Math.max(5.5 * k, r * .26); need += r < 11 * k ? base : base * (1.4 - bend * .8); } acc += seg; }
+          need += r < 10 * k ? r * 2.05 : Math.max(5 * k, r * .24); } acc += seg; }
       ctx.clearRect(0, 0, W, H);
       for (const s of snacks) { const w = 1 + Math.sin(t * 6 + s.b) * .15; ctx.fillStyle = ink; ctx.beginPath(); ctx.arc(s.x, s.y, 5 * k * w, 0, 7); ctx.fill(); ctx.strokeStyle = ink; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(s.x, s.y, 11 * k * w, 0, 7); ctx.stroke(); }
       ctx.lineWidth = 1.5 * k; ctx.strokeStyle = ink;
