@@ -415,7 +415,7 @@
     cv.addEventListener("click", e => {
       const q = pos(e), h0 = pts[0];
       if (h0 && Math.hypot(q.x - h0.x, q.y - h0.y) < h0.r * 1.4) { if (card && !edit) card.hidden = !card.hidden; return; }
-      drops++; const coffee = drops % 4 === 0, nm = NAMES[(drops * 7) % NAMES.length]; snacks.push({ x: q.x, y: q.y, b: performance.now() / 1000, kind: coffee ? "coffee" : (/\./.test(nm) ? "file" : "folder"), name: coffee ? "coffee" : nm });
+      drops++; const coffee = drops % 4 === 0, nm = NAMES[Math.floor(Math.random() * NAMES.length)]; snacks.push({ x: q.x, y: q.y, b: performance.now() / 1000, kind: coffee ? "coffee" : (/\./.test(nm) ? "file" : "folder"), name: coffee ? "coffee" : nm });
     });
     if (card) { const x = card.querySelector("[data-fgclose]"); if (x) x.addEventListener("click", () => card.hidden = true); }
     function step(ms) {
@@ -447,13 +447,13 @@
           pts.push({ x, y, r, a: prev ? Math.atan2(y - prev.y, x - prev.x) : head.a }); i++;
           need += r < 10 * k ? r * 2.05 : Math.max(5 * k, r * .24); } acc += seg; }
       ctx.clearRect(0, 0, W, H);
-      for (const s of snacks) { const bob = Math.sin(t * 3 + s.b) * 2 * k, x = s.x, y = s.y + bob, u = k;
-        ctx.lineWidth = 1.5 * k; ctx.strokeStyle = ink; ctx.fillStyle = paper; ctx.beginPath();
+      for (const s of snacks) { const u = Math.max(1.1, k * 1.5), bob = Math.sin(t * 3 + s.b) * 2 * u, x = s.x, y = s.y + bob;
+        ctx.lineWidth = 1.5; ctx.strokeStyle = ink; ctx.fillStyle = paper; ctx.beginPath();
         if (s.kind === "file") { ctx.moveTo(x - 11 * u, y - 14 * u); ctx.lineTo(x + 5 * u, y - 14 * u); ctx.lineTo(x + 11 * u, y - 8 * u); ctx.lineTo(x + 11 * u, y + 14 * u); ctx.lineTo(x - 11 * u, y + 14 * u); ctx.closePath(); ctx.fill(); ctx.stroke(); ctx.beginPath(); ctx.moveTo(x + 5 * u, y - 14 * u); ctx.lineTo(x + 5 * u, y - 8 * u); ctx.lineTo(x + 11 * u, y - 8 * u); ctx.stroke(); for (let l = 0; l < 3; l++) { ctx.beginPath(); ctx.moveTo(x - 6 * u, y - 2 * u + l * 5 * u); ctx.lineTo(x + 6 * u - (l === 2 ? 5 * u : 0), y - 2 * u + l * 5 * u); ctx.stroke(); } }
         else if (s.kind === "folder") { ctx.moveTo(x - 14 * u, y - 9 * u); ctx.lineTo(x - 4 * u, y - 9 * u); ctx.lineTo(x - 1 * u, y - 5 * u); ctx.lineTo(x + 14 * u, y - 5 * u); ctx.lineTo(x + 14 * u, y + 11 * u); ctx.lineTo(x - 14 * u, y + 11 * u); ctx.closePath(); ctx.fill(); ctx.stroke(); ctx.beginPath(); ctx.moveTo(x - 14 * u, y - 1 * u); ctx.lineTo(x + 14 * u, y - 1 * u); ctx.stroke(); }
         else { ctx.moveTo(x - 9 * u, y - 6 * u); ctx.lineTo(x + 9 * u, y - 6 * u); ctx.lineTo(x + 7 * u, y + 11 * u); ctx.quadraticCurveTo(x, y + 13 * u, x - 7 * u, y + 11 * u); ctx.closePath(); ctx.fill(); ctx.stroke(); ctx.beginPath(); ctx.arc(x + 11 * u, y + 2 * u, 4 * u, -Math.PI / 2, Math.PI / 2); ctx.stroke(); ctx.beginPath(); ctx.ellipse(x, y - 6 * u, 9 * u, 2.5 * u, 0, 0, 7); ctx.fillStyle = ink; ctx.fill();
           for (let st = -1; st <= 1; st++) { const ph = t * 2 + st; ctx.beginPath(); ctx.moveTo(x + st * 4 * u, y - 10 * u); ctx.bezierCurveTo(x + st * 4 * u + Math.sin(ph) * 3 * u, y - 14 * u, x + st * 4 * u - Math.sin(ph) * 3 * u, y - 18 * u, x + st * 4 * u, y - 22 * u); ctx.globalAlpha = .5; ctx.stroke(); ctx.globalAlpha = 1; } }
-        ctx.fillStyle = ink; ctx.font = `${11 * k}px Geist, system-ui, sans-serif`; ctx.textAlign = "center"; ctx.fillText(s.name, x, y + 28 * u); }
+        ctx.fillStyle = ink; ctx.font = `12px Geist, system-ui, sans-serif`; ctx.textAlign = "center"; ctx.fillText(s.name, x, y + 26 * u); }
       ctx.lineWidth = 1.5 * k; ctx.strokeStyle = ink;
       const gf = Math.max(0, 1 - (t - gulp) * 1.2), bulge = gf > 0 ? (1 - gf) * pts.length : -999;
       // Safari: one path per ring is slow. Rings only overlap their neighbours, so draw in two passes of batched paths (odd, then even): fill all, stroke all.
