@@ -449,8 +449,11 @@ body[data-device="phone"] .hs { position: relative; } body[data-device="phone"] 
 .hs-sec-casehead .nf-fg-static { grid-column: 1 / -1; max-width: 560px; }
 .hs-pub .hs-sec-creature .hs-rv { opacity: 1; transform: none; }
 @media (max-width: 720px) {
-  .nf-nav { grid-template-columns: 1fr auto; }
+  .nf-nav { grid-template-columns: 1fr; justify-items: center; }
   .nf-where { display: none; }
+  .nf-name { justify-self: center; }
+  .nf-nav .nf-pill { position: fixed; left: 50%; bottom: max(16px, env(safe-area-inset-bottom)); transform: translateX(-50%); z-index: 30; box-shadow: 0 12px 30px rgba(0,0,0,.18); }
+  .hs { padding-bottom: 96px; }
   .nf-fg { top: auto; bottom: 64px; transform: none; }
 }
 

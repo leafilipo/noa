@@ -398,7 +398,12 @@
       if (!reduce) {
         const want = Math.atan2(ty - head.y, tx - head.x); let da = want - head.a; while (da > Math.PI) da -= Math.PI * 2; while (da < -Math.PI) da += Math.PI * 2;
         const dist = Math.hypot(tx - head.x, ty - head.y), sp = (chasing ? 3.6 : 2.1) * k * Math.min(1, dist / (80 * k) + .3);
-        head.a += Math.max(-.026, Math.min(.026, da)) + Math.sin(t * .9) * .004; head.x += Math.cos(head.a) * sp; head.y += Math.sin(head.a) * sp;
+        const M = 60 * k, R = 30 * k; let turn = Math.max(-.026, Math.min(.026, da)) + Math.sin(t * .9) * .004;
+        // near an edge: steer toward the centre, harder the closer he gets
+        const ex = head.x < M ? (M - head.x) / M : head.x > W - M ? -(head.x - (W - M)) / M : 0, ey = head.y < M ? (M - head.y) / M : head.y > H - M ? -(head.y - (H - M)) / M : 0;
+        if (ex || ey) { const wa = Math.atan2(ey || (H / 2 - head.y) / H, ex || (W / 2 - head.x) / W); let dd = wa - head.a; while (dd > Math.PI) dd -= Math.PI * 2; while (dd < -Math.PI) dd += Math.PI * 2; turn += Math.max(-.09, Math.min(.09, dd)) * Math.min(1, Math.hypot(ex, ey)); }
+        head.a += turn; head.x += Math.cos(head.a) * sp; head.y += Math.sin(head.a) * sp;
+        head.x = Math.max(R, Math.min(W - R, head.x)); head.y = Math.max(R, Math.min(H - R, head.y));
         if (Math.hypot(head.x - trail[0].x, head.y - trail[0].y) > .8) trail.unshift({ x: head.x, y: head.y }); if (trail.length > 20000) trail.length = 20000;
       }
       pts = []; let acc = 0, need = 0, i = 0;

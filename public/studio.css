@@ -1,6 +1,6 @@
 /* Studio chrome in the site's own language: grey cards, pills, mono labels. Dark first; light with [data-st="light"]. */
-:root { --st-bg: #141414; --st-panel: #1C1C1C; --st-card: #242424; --st-card2: #2E2E2E; --st-ink: #EFEEEA; --st-mut: #8E8C86; --st-line: rgba(239,238,234,.12); --st-hi: #CFE3E6; --st-hi-ink: #141414; --st-hi-soft: rgba(207,227,230,.14); --st-ok: #5FD37F; --st-warn: #FF9F0A; --st-bad: #FF7A70; --st-ui: "Inter Tight", "Helvetica Neue", Helvetica, Arial, sans-serif; --st-mono: "Plex Mono", ui-monospace, Menlo, monospace; --st-r: 14px; color-scheme: dark; }
-:root[data-st="light"] { --st-bg: #F4F2ED; --st-panel: #FBFAF7; --st-card: #E9E7E1; --st-card2: #DFDDD6; --st-ink: #131313; --st-mut: #7D7D7D; --st-line: rgba(19,19,19,.12); --st-hi: #1E3A40; --st-hi-ink: #FFFFFF; --st-hi-soft: rgba(30,58,64,.12); --st-ok: #248A3D; --st-warn: #E8870C; --st-bad: #D70015; color-scheme: light; }
+:root { --st-bg: #141414; --st-panel: #1C1C1C; --st-card: #242424; --st-card2: #2E2E2E; --st-ink: #EFEEEA; --st-mut: #8E8C86; --st-line: rgba(239,238,234,.12); --st-hi: #CFE3E6; --st-hi-ink: #141414; --st-hi-soft: rgba(207,227,230,.14); --st-ok: #5FD37F; --st-warn: #FF9F0A; --st-bad: #FF7A70; --st-ui: "Geist", "Helvetica Neue", Helvetica, Arial, sans-serif; --st-mono: "Geist", "Helvetica Neue", Helvetica, Arial, sans-serif; --st-r: 14px; color-scheme: dark; }
+:root[data-st="light"] { --st-bg: #DCD8D3; --st-panel: #E4E1DC; --st-card: #CFCAC3; --st-card2: #C2BCB4; --st-ink: #1A1A1A; --st-mut: #5E5B55; --st-line: rgba(26,26,26,.16); --st-hi: #1E63D8; --st-hi-ink: #FFFFFF; --st-hi-soft: rgba(30,99,216,.14); --st-ok: #1F6E3C; --st-warn: #C97A08; --st-bad: #C2341F; color-scheme: light; }
 /* Studio chrome. Kept apart from the site styles (st- prefix), quiet so the site stays the focus. */
 html, body { height: 100%; margin: 0; }
 body { background: var(--st-bg); color: var(--st-ink); font-family: var(--st-ui); font-size: 13.5px; overflow: hidden; display: flex; flex-direction: column; -webkit-font-smoothing: antialiased; }
@@ -38,8 +38,8 @@ button { font: inherit; color: inherit; }
 .st-body { flex: 1; display: flex; min-height: 0; }
 .st-stage { flex: 1; overflow: auto; position: relative; }
 .st-stage > .hs { min-height: 100%; }
-body[data-device="phone"] .st-stage { padding: 28px 0 60px; }
-body[data-device="phone"] .st-stage > .hs { width: 390px; margin: 0 auto; min-height: 0; border-radius: 28px; box-shadow: 0 0 0 10px var(--st-card2), 0 30px 60px rgba(0, 0, 0, .35); overflow: clip; }
+body[data-device="phone"] .st-stage { padding: 24px 0; display: flex; justify-content: center; align-items: flex-start; overflow: hidden; }
+body[data-device="phone"] .st-stage > .hs { --ph-h: calc(100% - 48px); width: min(390px, calc(var(--ph-h) * 390 / 844)); height: var(--ph-h); min-height: 0; overflow: auto; border-radius: 28px; container: hs / inline-size; box-shadow: 0 0 0 10px var(--st-card2), 0 30px 60px rgba(0, 0, 0, .35); overflow: clip; }
 .st-panel { width: 360px; flex: none; overflow: auto; background: var(--st-panel); border-left: 1px solid var(--st-line); padding: 18px; box-sizing: border-box; }
 .st-ph { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
 .st-ph h3 { margin: 0; font-size: 17px; font-weight: 500; letter-spacing: -.01em; }
@@ -559,3 +559,7 @@ span.st-pil { cursor: default; height: 18px; font-size: 10.5px; padding: 0 7px 0
 .st-phead .st-ttabs, .st-qbar .st-ttabs { min-width: 0; overflow-x: auto; scrollbar-width: none; }
 .st-posts, .st-camps2, .st-cmp, .st-qlist { min-width: 0; max-width: 100%; }
 @media (max-width: 640px) { .st-phead-r { margin-left: 0; width: 100%; padding: 4px 0 10px; } .st-phead-r .st-primary { margin-left: auto; } .st-cmp { padding: 18px 16px 12px; } .st-qview { margin-left: 0; } }
+
+/* the phone preview is its own scroll viewport: full-height sections and the bottom nav measure against it */
+body[data-device="phone"] .st-stage > .hs .nf-creature { height: 100%; min-height: 0; }
+body[data-device="phone"] .st-stage > .hs .nf-pill-bottom { position: sticky; }
