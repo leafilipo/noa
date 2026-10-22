@@ -13,7 +13,7 @@
     "PUBLISHERS": "Lea",
     "ACCESS_TEAM_DOMAIN": "studiohuit.cloudflareaccess.com",
     // AUD of the Access app that protects /studio and /api on this Worker
-    "ACCESS_AUD": "",
+    "ACCESS_AUD": "886af93ffb705c38e86fb1b60fff94c94e95f7df73fa220b3ff5723732669dd6",
     "USERS": "{\"lea@huit.studio\":\"Lea\"}"
   },
   "observability": { "enabled": true }
