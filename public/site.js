@@ -20,7 +20,9 @@
   // gallery placeholders until real images: soft gradients in the site's inks and skies
   const GRAD = ["linear-gradient(160deg,#1E63D8,#A9D2F7)", "linear-gradient(20deg,#1A1A1A,#5E5B55)", "radial-gradient(circle at 30% 30%,#FFFFFF,#A9D2F7 60%,#1E63D8)", "linear-gradient(200deg,#F3F1EA,#C9C3BB)", "linear-gradient(135deg,#1B3FA0,#1E63D8 50%,#A9D2F7)", "radial-gradient(circle at 70% 70%,#5E5B55,#1A1A1A)", "linear-gradient(90deg,#DCD8D3,#1E63D8)", "conic-gradient(from 200deg,#A9D2F7,#1E63D8,#1B3FA0,#A9D2F7)", "linear-gradient(180deg,#1A1A1A 40%,#DCD8D3 40%)", "radial-gradient(circle at 50% 100%,#F3F1EA,#DCD8D3 50%,#C9C3BB)", "linear-gradient(240deg,#1E63D8,#1A1A1A)"];
   // the worm's face, for the home tab
-  const FACE = `<svg class="nf-face-svg" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10.5" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="8.3" cy="12" r="1.5" fill="currentColor"/><circle cx="15.3" cy="9.6" r="1.5" fill="currentColor"/><g transform="translate(13.4 15.2) rotate(-28)"><ellipse rx="3.6" ry="1.9" fill="currentColor"/><ellipse cx=".6" cy="2" rx="1.1" ry="1.4" fill="var(--bg,#DCD8D3)" stroke="currentColor" stroke-width=".9"/></g></svg>`;
+  const FACE = `<svg class="nf-face-svg" viewBox="4.5 8 35.2 35.2" aria-hidden="true"><circle cx="22.1" cy="25.7" r="17" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M27.7174 23.7114C26.2418 22.8594 25.7362 20.9725 26.5881 19.4969C27.4401 18.0213 29.3269 17.5157 30.8026 18.3677C32.2782 19.2196 32.7838 21.1065 31.9318 22.5821C31.0799 24.0577 29.193 24.5633 27.7174 23.7114Z" fill="currentColor" stroke="var(--bg,#DCD8D3)" stroke-width=".8" stroke-miterlimit="10"/><path d="M12.1812 25.2746C10.7056 24.4227 10.2 22.5358 11.0519 21.0602C11.9039 19.5846 13.7908 19.079 15.2664 19.9309C16.742 20.7829 17.2476 22.6698 16.3956 24.1454C15.5437 25.621 13.6568 26.1266 12.1812 25.2746Z" fill="currentColor" stroke="var(--bg,#DCD8D3)" stroke-width=".8" stroke-miterlimit="10"/><path d="M17.4697 36.7492C19.79 37.3657 26.0763 36.8022 28.6997 35.6185C31.323 34.4348 32.4335 32.8626 32.214 30.6769C32.1941 30.467 32.1567 30.2646 32.1036 30.0664C31.5024 27.7705 28.8015 26.7975 26.7797 28.0464C25.9714 28.5453 24.6107 29.1 22.3923 29.3227C20.1738 29.5453 18.7291 29.2756 17.8388 28.9467C15.6094 28.1269 13.1575 29.6169 13.0271 31.9886C13.0149 32.1931 13.0196 32.3987 13.0395 32.6086C13.259 34.7943 15.1494 36.1326 17.4697 36.7492Z" fill="currentColor" stroke="var(--bg,#DCD8D3)" stroke-width=".8" stroke-miterlimit="10"/><path d="M26.3859 35.6626C26.3859 35.6626 26.9382 39.372 23.7176 39.9023C20.4971 40.4326 18.1098 34.9759 20.4486 34.5142C26.8143 33.2557 26.3859 35.6626 26.3859 35.6626Z" fill="var(--bg,#DCD8D3)" stroke="currentColor" stroke-width="1.4" stroke-miterlimit="10"/><path d="M24.4268 33.8173C24.4268 33.8173 22.7355 33.608 23.0526 35.8766C23.1491 36.5495 23.1719 34.0892 22.0861 34.2516C21.0056 34.4125 20.6704 33.3284 20.6704 33.3284L24.4248 33.8206L24.4268 33.8173Z" fill="currentColor" stroke="currentColor" stroke-width=".8" stroke-miterlimit="10"/></svg>`;
+  // the face (from FACE.svg): eyes, mouth, tongue. Coordinates are in the SVG's space, centred on the head disc at (22.1, 25.7), radius 17.6.
+  const FACE_PATHS = [{ d: "M27.7174 23.7114C26.2418 22.8594 25.7362 20.9725 26.5881 19.4969C27.4401 18.0213 29.3269 17.5157 30.8026 18.3677C32.2782 19.2196 32.7838 21.1065 31.9318 22.5821C31.0799 24.0577 29.193 24.5633 27.7174 23.7114Z", f: "ink", s: "paper" }, { d: "M12.1812 25.2746C10.7056 24.4227 10.2 22.5358 11.0519 21.0602C11.9039 19.5846 13.7908 19.079 15.2664 19.9309C16.742 20.7829 17.2476 22.6698 16.3956 24.1454C15.5437 25.621 13.6568 26.1266 12.1812 25.2746Z", f: "ink", s: "paper" }, { d: "M17.4697 36.7492C19.79 37.3657 26.0763 36.8022 28.6997 35.6185C31.323 34.4348 32.4335 32.8626 32.214 30.6769C32.1941 30.467 32.1567 30.2646 32.1036 30.0664C31.5024 27.7705 28.8015 26.7975 26.7797 28.0464C25.9714 28.5453 24.6107 29.1 22.3923 29.3227C20.1738 29.5453 18.7291 29.2756 17.8388 28.9467C15.6094 28.1269 13.1575 29.6169 13.0271 31.9886C13.0149 32.1931 13.0196 32.3987 13.0395 32.6086C13.259 34.7943 15.1494 36.1326 17.4697 36.7492Z", f: "ink", s: "paper" }, { d: "M26.3859 35.6626C26.3859 35.6626 26.9382 39.372 23.7176 39.9023C20.4971 40.4326 18.1098 34.9759 20.4486 34.5142C26.8143 33.2557 26.3859 35.6626 26.3859 35.6626Z", f: "paper", s: "ink" }, { d: "M24.4268 33.8173C24.4268 33.8173 22.7355 33.608 23.0526 35.8766C23.1491 36.5495 23.1719 34.0892 22.0861 34.2516C21.0056 34.4125 20.6704 33.3284 20.6704 33.3284L24.4248 33.8206L24.4268 33.8173Z", f: "ink", s: "ink" }];
   function make(V, opts) {
     const E = !!(opts && opts.edit);
     const f = (path, tag, cls, attrs) => { const v = get(V, path); return `<${tag || "span"} class="${cls || ""}" data-f="${esc(path)}"${attrs || ""}>${esc(v)}</${tag || "span"}>`; };
@@ -384,7 +386,7 @@
     const cv = root.querySelector("canvas"), card = root.querySelector(".nf-fg"), cap = root.querySelector(".nf-cap > span"), cnt = root.querySelector(".nf-count");
     if (!cv || cv.dataset.on) return; cv.dataset.on = "1";
     const ctx = cv.getContext("2d"), reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
-    let W = 0, H = 0, k = 1, N = 380, head = null, trail = [], snacks = [], eaten = 0, gulp = -9, nextBlink = 2, raf = 0, pts = [];
+    let this_face = null, W = 0, H = 0, k = 1, N = 380, head = null, trail = [], snacks = [], eaten = 0, gulp = -9, nextBlink = 2, raf = 0, pts = [];
     const m = { x: 0, y: 0, at: -1e9 }, edit = !!root.closest(".st-editing"), base = cap ? cap.textContent : "";
     const col = n => getComputedStyle(root).getPropertyValue(n).trim();
     function fit() {
@@ -439,13 +441,11 @@
       for (let q = pts.length - 1; q >= 0; q--) { ctx.beginPath(); ring(q); ctx.fill(); ctx.stroke(); }
       const hp = pts[0];
       if (hp) { const r = hp.r, cx = hp.x + Math.cos(head.a) * r * .18, cy = hp.y + Math.sin(head.a) * r * .18;
-        // the face: two dot eyes, a filled open mouth with a little tongue (the drawing)
-        ctx.fillStyle = ink;
-        for (const s of [-1, 1]) { ctx.beginPath(); ctx.arc(cx + s * r * .3 + (s < 0 ? r * .02 : 0), cy - r * (s < 0 ? .08 : .24), r * .13, 0, 7); ctx.fill(); }
-        ctx.save(); ctx.translate(cx + r * .12, cy + r * .3); ctx.rotate(-.5);
-        ctx.beginPath(); ctx.ellipse(0, 0, r * .33, r * .17, 0, 0, 7); ctx.fill();
-        const tw = chasing ? Math.sin(t * 9) * .15 : 0; ctx.fillStyle = paper; ctx.beginPath(); ctx.ellipse(r * .06, r * .19 + tw * r, r * .1, r * .13, .1, 0, 7); ctx.fill();
-        ctx.strokeStyle = ink; ctx.lineWidth = 1.2 * k; ctx.stroke(); ctx.restore(); }
+        // the face from FACE.svg, scaled to the head and turned the way he is going
+        ctx.save(); ctx.translate(cx, cy); ctx.rotate(head.a + Math.PI / 2); const sc = r / 17.6; ctx.scale(sc, sc); ctx.translate(-22.1, -25.7);
+        if (!this_face) this_face = FACE_PATHS.map(f => ({ p: new Path2D(f.d), f: f.f, s: f.s }));
+        ctx.lineWidth = .9 / 1; for (const f of this_face) { ctx.fillStyle = f.f === "ink" ? ink : paper; ctx.strokeStyle = f.s === "ink" ? ink : paper; ctx.fill(f.p); ctx.stroke(f.p); }
+        ctx.restore(); }
       raf = requestAnimationFrame(step);
     }
     raf = requestAnimationFrame(step); creatures.push({ stop: () => cancelAnimationFrame(raf) });
