@@ -265,12 +265,13 @@
     pages: {
       home: { path: "/", title: "noa · experimental and speculative design, Berlin", desc: "Creatures, systems and instruments by noa, an experimental digital artist in Berlin.", sections: [
         LIB.creature.make(), LIB.specimens.make() ] },
-      about: { path: "/about", title: "About · noa", desc: "noa is an experimental digital artist in Berlin.", sections: [
-        { t: "notes", side: "left", label: "Origin", img: "", body: ["I started in Blender, wiring node trees long before I would have called any of it design. [When it started and what you were making back then.]", "That habit of building small systems and watching what comes out of them never left. It took me through ten years of brand and product work, as Art Director at Gnosis, Head of Design at Glassnode and with Studio Huit. This site is where the other half lives."] },
-        { t: "notes", side: "right", label: "How I make things", img: "", body: ["Most pieces start as a set of rules: some noise, a few forces, a palette. I let them run, keep the accidents I like and tune the rest by hand.", "[Something about your tools: code, 3D, motion, automations. What you reach for first.]"] },
-        { t: "notes", side: "none", label: "Speculative", body: ["[What world these creatures come from. What you are proposing with them, or asking.]"] },
-        { t: "notes", side: "none", label: "Outside the work", body: ["[A few lines about life in Berlin, what you do with your hands, where you go when you are not at a screen.]"] },
-        LIB.hello.make() ] },
+      about: { path: "/about", title: "About · noa", desc: "noa is an experimental digital artist in Berlin: creatures, systems and small instruments.", sections: [
+        {"t": "notes", "side": "left", "label": "Hello", "img": "", "body": ["I’m noa, an experimental digital artist in Berlin.", "I make creatures, systems and small instruments, and let them loose on the web. Some follow you around, some blink, some just want to be fed."]},
+        {"t": "notes", "side": "right", "label": "What I keep coming back to", "img": "", "body": ["Eyes. Skeletons. Blue skies with clouds. Geometry, repeated until it starts to feel alive.", "Most of what lives here is some mix of those."]},
+        {"t": "notes", "side": "none", "label": "Speculative", "body": ["I like designing for worlds that don’t exist yet. Everything here is treated as a real specimen, with a field guide entry, a habitat and a behaviour, as if someone had found it and written it down."]},
+        {"t": "notes", "side": "none", "label": "Experimental", "body": ["Nothing here is finished. Things get fed, renamed and broken. The site is the sketchbook and the exhibition at the same time."]},
+        {"t": "notes", "side": "none", "label": "Also", "body": ["By day I’m a product and brand designer and run Studio Huit. This is the other half."]},
+        {"t": "hello", "label": "Contact", "title": "Say hi.", "email": "lea@huit.studio"} ] },
       tools: { path: "/tools", title: "Tools · noa", desc: "Instruments noa built for herself. Some are free to play with.", sections: [
         { t: "tools", title: "Instruments", intro: "Small tools I built for myself. Some are free to play with.", items: [
           { name: "Instrument no. 1", text: "A pendulum drawing machine. Every visit draws something new.", price: "", period: "free", status: "live", img: "", custom: "", buy: { label: "", href: "" }, try: { label: "Play", href: "" }, wait: { label: "", href: "" } },
