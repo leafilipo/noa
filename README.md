@@ -1,4 +1,4 @@
-# noafilipo
+# noa
 
 noa's website and Studio: experimental and speculative design. A fork of the Huit builder (Huit-Studio/website), kept separate.
 
@@ -9,5 +9,5 @@ noa's website and Studio: experimental and speculative design. A fork of the Hui
 
 Publishing freezes every page as HTML in D1.
 
-Setup: D1 database `noafilipo` (id in `wrangler.jsonc`), connect the repo in Workers Builds, add an Access app for `/studio` and `/api`, put its AUD in `ACCESS_AUD`.
+Setup: D1 database `noa` (id in `wrangler.jsonc`), connect the repo in Workers Builds, add an Access app for `/studio` and `/api`, put its AUD in `ACCESS_AUD`.
 Local: `npx wrangler dev --local --var ACCESS_TEAM_DOMAIN:` and send `cf-access-authenticated-user-email: lea@huit.studio`.

@@ -1,9 +1,9 @@
 {
-  "name": "noafilipo",
+  "name": "noa",
   "main": "src/worker.js",
   "compatibility_date": "2026-09-01",
   "assets": { "directory": "./public", "binding": "ASSETS", "run_worker_first": true },
-  "d1_databases": [{ "binding": "DB", "database_name": "noafilipo", "database_id": "c8a540c6-8cfc-4999-b83f-2faeabd64b11" }],
+  "d1_databases": [{ "binding": "DB", "database_name": "noa", "database_id": "33c1f48d-0213-4794-b09b-37aa078125bb" }],
   "ai": { "binding": "AI" },
   "workers_dev": true,
   "preview_urls": false,
