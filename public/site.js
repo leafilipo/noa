@@ -19,6 +19,8 @@
     return `<svg class="nf-art" viewBox="0 0 200 200" aria-hidden="true">${s}</svg>`; };
   // gallery placeholders until real images: soft gradients in the site's inks and skies
   const GRAD = ["linear-gradient(160deg,#1E63D8,#A9D2F7)", "linear-gradient(20deg,#1A1A1A,#5E5B55)", "radial-gradient(circle at 30% 30%,#FFFFFF,#A9D2F7 60%,#1E63D8)", "linear-gradient(200deg,#F3F1EA,#C9C3BB)", "linear-gradient(135deg,#1B3FA0,#1E63D8 50%,#A9D2F7)", "radial-gradient(circle at 70% 70%,#5E5B55,#1A1A1A)", "linear-gradient(90deg,#DCD8D3,#1E63D8)", "conic-gradient(from 200deg,#A9D2F7,#1E63D8,#1B3FA0,#A9D2F7)", "linear-gradient(180deg,#1A1A1A 40%,#DCD8D3 40%)", "radial-gradient(circle at 50% 100%,#F3F1EA,#DCD8D3 50%,#C9C3BB)", "linear-gradient(240deg,#1E63D8,#1A1A1A)"];
+  // the worm's face, for the home tab
+  const FACE = `<svg class="nf-face-svg" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10.5" fill="none" stroke="currentColor" stroke-width="1.5"/><ellipse cx="8.6" cy="9.6" rx=".95" ry="1.35" fill="currentColor"/><ellipse cx="15.4" cy="9.6" rx=".95" ry="1.35" fill="currentColor"/><path d="M8 13.2a4.4 4.4 0 0 0 8 0" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><ellipse cx="12.8" cy="16.6" rx="1.3" ry="1.6" fill="currentColor"/></svg>`;
   function make(V, opts) {
     const E = !!(opts && opts.edit);
     const f = (path, tag, cls, attrs) => { const v = get(V, path); return `<${tag || "span"} class="${cls || ""}" data-f="${esc(path)}"${attrs || ""}>${esc(v)}</${tag || "span"}>`; };
@@ -188,7 +190,7 @@
     const cta = cur => V.site.cta ? `<a class="hs-cta ${cur.startsWith(V.site.cta.href) ? "on" : ""}" href="${esc(V.site.cta.href)}"><span ${E ? 'data-f="site.cta.label"' : ""}>${esc(V.site.cta.label)}</span><span aria-hidden="true">→</span></a>` : "";
     // ---- noa: name, pill nav, city and time; a quiet footer ----
     const noaNav = cur => `<header class="nf-nav"><a class="nf-name" href="/"><span ${E ? 'data-f="site.name"' : ""}>${esc(V.site.name)}</span></a>
-      <nav class="nf-pill" aria-label="Main">${(V.site.nav || []).map((n, i) => `<a href="${esc(n.href)}" class="${isOn(cur, n.href) ? "on" : ""}"${isOn(cur, n.href) ? ' aria-current="page"' : ""}><span ${E ? `data-f="site.nav.${i}.label"` : ""}>${esc(n.label)}</span></a>`).join("")}</nav>
+      <nav class="nf-pill" aria-label="Main">${(V.site.nav || []).map((n, i) => `<a href="${esc(n.href)}" class="${isOn(cur, n.href) ? "on" : ""}${n.href === "/" ? " nf-face" : ""}"${isOn(cur, n.href) ? ' aria-current="page"' : ""}${n.href === "/" ? ' aria-label="Home"' : ""}>${n.href === "/" ? FACE : ""}<span ${E ? `data-f="site.nav.${i}.label"` : ""}>${esc(n.label)}</span></a>`).join("")}</nav>
       <span class="nf-where"><span ${E ? 'data-f="site.city"' : ""}>${esc(V.site.city)}</span> <span data-clock="${esc(V.site.tz || "Europe/Berlin")}">--:--</span></span></header>`;
     const noaFoot = () => `<footer class="nf-foot"><a href="mailto:${esc(V.site.email)}"><span ${E ? 'data-f="site.email"' : ""}>${esc(V.site.email)}</span></a>
       ${(V.site.social || []).map((l, i) => `<a href="${esc(l.href)}" target="_blank" rel="noopener" data-href="site.social.${i}.href"><span ${E ? `data-f="site.social.${i}.label"` : ""}>${esc(l.label)}</span></a>`).join("")}

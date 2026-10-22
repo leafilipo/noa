@@ -398,6 +398,10 @@ body[data-device="phone"] .hs { position: relative; } body[data-device="phone"] 
 .nf-pill a { padding: 9px 18px; border-radius: 999px; transition: background .25s, color .25s; }
 .nf-pill a:hover { background: var(--card); }
 .nf-pill a.on { background: var(--ink); color: var(--bg); }
+.nf-pill a.nf-face { display: inline-grid; place-items: center; padding: 6px 12px; }
+.nf-pill a.nf-face > span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+.nf-face-svg { width: 22px; height: 22px; display: block; }
+.st-editing .nf-pill a.nf-face > span { position: static; width: auto; height: auto; clip: auto; margin-left: 8px; }
 .hs-sec-creature { margin-top: calc(-1 * (var(--gap) + 52px)); margin-inline: calc(-1 * var(--pad)); }
 .nf-creature { position: relative; height: 100svh; min-height: 420px; cursor: crosshair; }
 .st-stage .nf-creature { height: calc(100cqh - 1px); }
