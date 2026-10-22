@@ -40,8 +40,8 @@
     const d = Object.fromEntries(new FormData(form)); d.page = location.pathname; if (d.package) d.message = "[" + d.package + "] " + d.message; if (d.estimate) d.message = "[" + d.estimate + "]\n" + d.message;
     if (!d.email || !d.message) { msg.textContent = "Please add your email and a message."; return; }
     b.disabled = true; msg.textContent = "Sending…";
-    try { const r = await fetch("/_form", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(d) }); if (!r.ok) throw 0; form.reset(); msg.textContent = "Thanks. We’ll get back to you soon."; }
-    catch (e) { msg.textContent = "That didn’t go through. Please write to us by email."; }
+    try { const r = await fetch("/_form", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(d) }); if (!r.ok) throw 0; form.reset(); msg.textContent = "Thanks, I’ll write back soon."; }
+    catch (e) { msg.textContent = "That didn’t go through. Email works too."; }
     b.disabled = false;
   }));
 })();
