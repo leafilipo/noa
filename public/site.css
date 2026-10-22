@@ -447,6 +447,7 @@ body[data-device="phone"] .hs { position: relative; } body[data-device="phone"] 
 .hs:has(.nf-home) { height: 100svh; min-height: 420px; padding-bottom: 0 !important; overflow: hidden; }
 .hs:has(.nf-home) .hs-main { min-height: 0; }
 .hs:has(.nf-home) .hs-sec-creature { flex: 1; min-height: 0; margin-top: calc(-1 * (var(--gap) + 52px)); margin-bottom: calc(-1 * var(--pad)); }
+.hs:has(.nf-home) .hs-sec-creature > .hs-rv { height: 100%; }
 .hs:has(.nf-home) .nf-creature { height: 100%; min-height: 0; }
 .nf-foot { display: flex; flex-wrap: wrap; gap: 8px 20px; align-items: center; padding-top: 18px; margin-top: clamp(32px, 5cqi, 80px); border-top: 1.5px solid var(--ink); font-family: var(--mono); font-size: 12.5px; }
 .nf-grow { flex: 1; }
