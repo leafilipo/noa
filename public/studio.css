@@ -566,3 +566,4 @@ body[data-device="phone"] .st-stage > .hs { container: hs / size; transform: tra
 body[data-device="phone"] .st-stage > .hs:has(.nf-home) { height: var(--ph-h); }
 .st-stage > .hs:has(.nf-home) { height: 100%; }
 .st-stage { container: stage / size; }
+body[data-device="phone"] .st-stage > .hs .hs-consent { position: absolute; }

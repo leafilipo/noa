@@ -342,16 +342,13 @@ a.hs-fpill:hover { background: var(--card-2); }
 .hs.dark .hs-tone-tint.hs-mod-work:hover { background: color-mix(in srgb, var(--tint) 70%, var(--bg)); }
 
 /* cookie banner */
-.hs-consent { position: fixed; left: 16px; right: 16px; bottom: 16px; z-index: 40; max-width: 560px; margin-left: auto; background: var(--ink); color: var(--bg); border-radius: 18px; padding: 16px 18px; display: flex; flex-wrap: wrap; gap: 12px 18px; align-items: center; justify-content: space-between; box-shadow: 0 20px 50px rgba(0,0,0,.25); }
+.hs-consent { position: fixed; left: 16px; right: 16px; bottom: 16px; z-index: 40; max-width: 560px; margin-left: auto; background: var(--bg); color: var(--ink); border: 1.5px solid var(--ink); border-radius: 18px; padding: 16px 18px; display: flex; flex-wrap: wrap; gap: 12px 18px; align-items: center; justify-content: space-between; box-shadow: 0 20px 50px rgba(0,0,0,.25); }
 .hs-consent[hidden] { display: none; }
-.hs-consent p { margin: 0; flex: 1 1 280px; line-height: 1.45; }
+.hs-consent p { margin: 0; flex: 1 1 280px; line-height: 1.45; color: inherit; font-size: 13.5px; }
 .hs-consent a { color: inherit; text-decoration: underline; text-underline-offset: 3px; }
 .hs-consent-b { display: flex; gap: 8px; }
-.hs-consent .hs-btn-s { height: 36px; padding: 0 14px; border-radius: 999px; border: 1px solid color-mix(in srgb, var(--bg) 35%, transparent); background: none; color: inherit; font: inherit; cursor: pointer; }
-.hs-consent .hs-btn-ink { background: var(--bg); color: var(--ink); border-color: var(--bg); }
-.hs.dark .hs-consent { background: var(--card); color: var(--ink); }
-.hs.dark .hs-consent .hs-btn-ink { background: var(--ink); color: var(--bg); border-color: var(--ink); }
-.hs.dark .hs-consent .hs-btn-s { border-color: color-mix(in srgb, var(--ink) 35%, transparent); }
+.hs-consent .hs-btn-s { height: 36px; padding: 0 14px; border-radius: 999px; border: 1.5px solid var(--line); background: none; color: inherit; font: inherit; cursor: pointer; }
+.hs-consent .hs-btn-ink { background: var(--ink); color: var(--bg); border-color: var(--ink); }
 .st-editing .hs-consent { position: static; display: flex; margin: var(--gap) 0 0; max-width: none; box-shadow: none; }
 
 /* index home: statement, then the work, nothing else */
@@ -456,6 +453,7 @@ body[data-device="phone"] .hs { position: relative; } body[data-device="phone"] 
 .hs-sec-casehead .nf-fg-static { grid-column: 1 / -1; max-width: 560px; }
 .hs-pub .hs-sec-creature .hs-rv { opacity: 1; transform: none; }
 @container hs (max-width: 720px) {
+  .hs-consent { bottom: 88px; }
   .nf-nav { grid-template-columns: 1fr; justify-items: center; }
   .nf-where { display: none; }
   .nf-name { justify-self: center; }
