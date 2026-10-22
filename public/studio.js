@@ -51,7 +51,7 @@
 
   // ---- pages ----
   function pageList() {
-    const v = V(); const pg = Object.entries(v.pages).map(([k, p]) => ({ route: p.path, name: { home: "Work", about: "About", tools: "Tools", contact: "Start a project", terms: "Terms", cookies: "Cookies", imprint: "Imprint", privacy: "Privacy", notfound: "404" }[k] || k }));
+    const v = V(); const pg = Object.entries(v.pages).map(([k, p]) => ({ route: p.path, name: { home: "Huit", work: "Work", about: "About", tools: "Tools", contact: "Start a project", terms: "Terms", cookies: "Cookies", imprint: "Imprint", privacy: "Privacy", notfound: "404" }[k] || k }));
     const cs = (v.cases || []).map(c => ({ route: "/work/" + c.slug, name: c.client, cas: true, hidden: c.hidden }));
     return { pg, cs };
   }
@@ -65,9 +65,10 @@
     const curName = (pg.find(p => p.route === state.route) || cs.find(p => p.route === state.route) || {}).name || "Page";
     $("#st-top").innerHTML = `
       <div class="st-l"><span class="st-brand"><svg viewBox="0 0 164 164" aria-hidden="true"><path fill="currentColor" stroke="currentColor" stroke-width="10" stroke-linejoin="round" d="M82.0 8.0L101.4 59.3L156.2 61.9L113.4 96.2L127.8 149.1L82.0 119.0L36.2 149.1L50.6 96.2L7.8 61.9L62.6 59.3Z"/></svg>Studio</span>
-        <button class="st-btn st-drop" data-panel="pages"><span class="st-k">Page</span>${esc(curName)}<i>▾</i></button>
-        <button class="st-btn st-drop" data-panel="versions"><span class="st-k">Version</span>${esc(v.name || state.verId)}${l && l.ver === state.verId ? '<span class="st-live">Live</span>' : ""}<i>▾</i></button>
+        ${state.view === "site" ? `<button class="st-btn st-drop" data-panel="pages"><span class="st-k">Page</span>${esc(curName)}<i>▾</i></button>
+        <button class="st-btn st-drop" data-panel="versions"><span class="st-k">Version</span>${esc(v.name || state.verId)}${l && l.ver === state.verId ? '<span class="st-live">Live</span>' : ""}<i>▾</i></button>` : ""}
         <span class="st-saved" id="st-saved" data-s="Saved">Saved</span></div>
+      <button class="st-gsearch" data-search type="button"><svg viewBox="0 0 20 20"><circle cx="9" cy="9" r="5.5"/><path d="M13 13l4 4"/></svg><span>Search</span><kbd>⌘K</kbd></button>
       <div class="st-r">
         <div class="st-seg"><button class="${state.edit ? "on" : ""}" data-mode="edit">Edit</button><button class="${!state.edit ? "on" : ""}" data-mode="view">Preview</button></div>
         <div class="st-seg"><button class="${state.device === "desktop" ? "on" : ""}" data-dev="desktop" title="Desktop"><svg viewBox="0 0 20 20"><rect x="2.5" y="4" width="15" height="10" rx="1.5"/><path d="M7 17h6"/></svg></button><button class="${state.device === "phone" ? "on" : ""}" data-dev="phone" title="Phone"><svg viewBox="0 0 20 20"><rect x="6" y="2.5" width="8" height="15" rx="1.8"/></svg></button></div>

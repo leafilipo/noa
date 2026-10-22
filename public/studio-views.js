@@ -61,9 +61,12 @@
 
 
   // ---- side menu ----
+  const ICON = Object.fromEntries(VIEWS.map(([id, , d]) => [id, d]));
+  ICON.plan = "M3 5h14v12H3z M3 9h14 M7 3v4 M13 3v4"; ICON.posts = "M5 15l1-4 7-7 3 3-7 7z M12 5l3 3";
+  const GROUPS = [["Site", [["site", "Website"], ["projects", "Projects"]]], ["Content", [["posts", "Create"], ["plan", "Plan"], ["stats", "Analytics"]]], ["Brand", [["brand", "Guides"], ["tone", "Tone of voice"], ["refs", "References"]]]];
   function renderSide() {
     const s = X.state;
-    $("#st-side").innerHTML = VIEWS.map(([id, name, d]) => `<button class="st-sitem ${s.view === id ? "on" : ""}" data-view="${id}" title="${esc(name)}"><svg viewBox="0 0 20 20"><path d="${d}"/></svg><span>${esc(name)}</span></button>`).join("");
+    $("#st-side").innerHTML = GROUPS.map(([g, items]) => `<div class="st-sgroup"><div class="st-ssec">${esc(g)}</div>${items.map(([id, name]) => `<button class="st-sitem ${s.view === id ? "on" : ""}" data-view="${id}" title="${esc(name)}" ${s.view === id ? 'aria-current="page"' : ""}><svg viewBox="0 0 20 20"><path d="${ICON[id] || ""}"/></svg><span>${esc(name)}</span></button>`).join("")}</div>`).join("");
   }
 
   // ---- views ----
@@ -129,12 +132,12 @@
 
   const grow = el => { el.style.height = "auto"; el.style.height = el.scrollHeight + "px"; };
   function render() {
-    renderSide();
+    renderSide(); if (X.renderTop) X.renderTop();
     const v = X.state.view, site = $("#site"), box = $("#st-view");
     document.body.dataset.view = v;
     if (v === "site" || !loaded) { site.hidden = false; box.hidden = true; box.innerHTML = ""; return; }
     site.hidden = true; box.hidden = false;
-    if (v === "posts") { box.innerHTML = ""; if (window.HSP) window.HSP.render(box); return; }
+    if (v === "posts" || v === "plan") { box.innerHTML = ""; if (window.HSP) window.HSP.render(box); return; }
     if (v === "stats") { box.innerHTML = ""; if (window.HSP) window.HSP.analytics(box); return; }
     box.innerHTML = `<div class="st-vwrap">${v === "projects" ? viewProjects() : v === "tone" ? viewTone() : v === "brand" ? viewBrand() : viewRefs()}</div>`;
     box.querySelectorAll("textarea.st-doc").forEach(grow);
@@ -180,6 +183,40 @@
     if (c("[data-addcase]")) { let cs; X.change(() => { cs = window.HS.newCase(V); V.cases.push(cs); }); render(); const el = [...$("#st-view").querySelectorAll(".st-pname")].pop(); if (el) { el.scrollIntoView({ block: "center" }); el.select(); } return; }
   });
 
-  window.HSV = { render, docs };
+
+  // ---- search: one field in the top bar, results from every part of the Studio ----
+  function searchIndex() {
+    const V = X.V(), out = [], push = (group, title, sub, go, hay) => out.push({ group, title, sub, go, hay: (title + " " + (sub || "") + " " + (hay || "")).toLowerCase() });
+    GROUPS.forEach(([g, items]) => items.forEach(([id, name]) => push("Go to", name, g, () => setView(id))));
+    Object.entries(V.pages || {}).forEach(([k, pg]) => push("Pages", pg.title ? pg.title.split(" · ")[0] : k, pg.path, () => { setView("site"); X.go(pg.path); }, pg.desc));
+    (V.cases || []).forEach(c => push("Projects", c.client, "/work/" + c.slug, () => { setView("site"); X.go("/work/" + c.slug); }, (c.tags || []).join(" ") + " " + (c.intro || []).join(" ")));
+    const P = window.HSP && window.HSP.data ? window.HSP.data() : { posts: [], camps: [] };
+    P.posts.forEach(p => push("Posts", p.title || "Untitled", [p.status ? p.status[0].toUpperCase() + p.status.slice(1) : "", p.date ? new Date(p.date + "T00:00").toLocaleDateString("en-GB", { day: "numeric", month: "short" }) : ""].filter(Boolean).join(" · "), () => window.HSP.openPost(p.id), p.brief + " " + Object.values(p.texts || {}).join(" ")));
+    P.camps.forEach(c => push("Campaigns", c.name, c.goal, () => window.HSP.openCampaigns(), c.notes));
+    const b = docs.brand && docs.brand.data; if (b) { (b.guides || []).forEach((g, gi) => g.rules.forEach(r => push("Guides", r, (g.part === "design" ? "Design · " : "Content · ") + g.topic, () => { setView("brand"); setTimeout(() => { const el = document.querySelector(`[data-row="guides.${gi}"]`); if (el) el.scrollIntoView({ block: "center" }); }, 60); }))); (b.colors || []).forEach(c => push("Guides", c.name, c.hex + " · Colour", () => setView("brand"))); }
+    const t = docs.tone && docs.tone.data; if (t) (t.principles || []).forEach(pr => push("Tone of voice", pr.title, pr.text, () => setView("tone")));
+    const r = docs.refs && docs.refs.data; if (r) (r.items || []).forEach(x => push("References", x.name, x.url, () => setView("refs"), x.note));
+    return out;
+  }
+  function setView(v) { X.state.view = v; X.state.panel = null; X.keep(); render(); }
+  let palSel = 0, palRes = [];
+  function openPalette() {
+    closePalette(); const idx = searchIndex();
+    const wrap = document.createElement("div"); wrap.className = "st-pal-wrap"; wrap.innerHTML = `<div class="st-pal" role="dialog" aria-label="Search"><label class="st-pal-in"><svg viewBox="0 0 20 20"><circle cx="9" cy="9" r="5.5"/><path d="M13 13l4 4"/></svg><input placeholder="Search pages, posts, projects, guides…" aria-label="Search"><kbd>Esc</kbd></label><div class="st-pal-res" role="listbox"></div></div>`;
+    document.body.appendChild(wrap); const inp = wrap.querySelector("input"), res = wrap.querySelector(".st-pal-res");
+    const draw = () => { const q = inp.value.trim().toLowerCase(), words = q.split(/\s+/).filter(Boolean);
+      palRes = (q ? idx.filter(x => words.every(w => x.hay.includes(w))) : idx.filter(x => x.group === "Go to")).slice(0, 40); palSel = Math.min(palSel, Math.max(0, palRes.length - 1));
+      let last = ""; res.innerHTML = palRes.map((x, i) => { const h = x.group !== last ? `<div class="st-pal-g">${esc(x.group)}</div>` : ""; last = x.group; return h + `<button class="st-pal-r ${i === palSel ? "on" : ""}" data-pi="${i}" role="option"><span>${esc(x.title)}</span><em>${esc(x.sub || "")}</em></button>`; }).join("") || `<p class="st-pal-none">Nothing found for “${esc(inp.value)}”.</p>`; };
+    const pick = i => { const x = palRes[i]; if (!x) return; closePalette(); x.go(); };
+    inp.addEventListener("input", () => { palSel = 0; draw(); });
+    inp.addEventListener("keydown", e => { if (e.key === "ArrowDown") { palSel = Math.min(palRes.length - 1, palSel + 1); draw(); e.preventDefault(); } else if (e.key === "ArrowUp") { palSel = Math.max(0, palSel - 1); draw(); e.preventDefault(); } else if (e.key === "Enter") { pick(palSel); e.preventDefault(); } else if (e.key === "Escape") closePalette(); });
+    res.addEventListener("click", e => { const b = e.target.closest("[data-pi]"); if (b) pick(+b.dataset.pi); });
+    wrap.addEventListener("mousedown", e => { if (e.target === wrap) closePalette(); });
+    draw(); inp.focus();
+  }
+  function closePalette() { const w = document.querySelector(".st-pal-wrap"); if (w) w.remove(); }
+  document.addEventListener("keydown", e => { if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") { e.preventDefault(); document.querySelector(".st-pal-wrap") ? closePalette() : openPalette(); } });
+  document.addEventListener("click", e => { if (e.target.closest("[data-search]")) openPalette(); });
+  window.HSV = { render, docs, openPalette };
   load().then(render).catch(() => {});
 })();

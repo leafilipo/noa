@@ -38,10 +38,11 @@
   const pdot = id => { const x = pil(id); return x ? `<i class="st-pd" style="--pc:${x.color}" title="${esc(x.name)}"></i>` : `<i class="st-pd st-pd-none" title="No pillar"></i>`; };
   const ttabs = (items, cur, attr) => `<div class="st-ttabs" role="tablist">${items.map(([k, n, c]) => `<button role="tab" aria-selected="${cur === k}" class="${cur === k ? "on" : ""}" ${attr}="${k}">${n}${c != null ? `<em>${c}</em>` : ""}</button>`).join("")}</div>`;
   function shell(inner) {
-    return `<div class="st-vwrap st-posts"><div class="st-phead">
-      ${ttabs([["queue", "Posts", posts.length], ["calendar", "Calendar"], ["campaigns", "Campaigns", camps.length]], tab, "data-ptab")}
-      <div class="st-phead-r"><div class="st-tpl"><button class="st-btn" data-tplopen>From template</button><div class="st-tpl-menu" hidden>${PIL().map(pl => `<div class="st-tpl-g"><div class="st-tpl-gh"><span class="st-pl">${pdot(pl.id)}${esc(pl.name)}</span><span class="st-m">${esc(pl.text)}</span></div>${(window.HS_TEMPLATES || []).filter(x => x.pillar === pl.id).map(x => `<button data-tpl="${x.id}"><b>${esc(x.name)}</b><span>${esc(x.brief)}</span></button>`).join("")}</div>`).join("")}</div></div><button class="st-btn st-primary" data-pnew>New post</button></div>
-    </div>${inner}</div>`;
+    const plan = X.state.view === "plan";
+    const tpl = `<div class="st-tpl"><button class="st-btn" data-tplopen>From template</button><div class="st-tpl-menu" hidden>${PIL().map(pl => `<div class="st-tpl-g"><div class="st-tpl-gh"><span class="st-pl">${pdot(pl.id)}${esc(pl.name)}</span><span class="st-m">${esc(pl.text)}</span></div>${(window.HS_TEMPLATES || []).filter(x => x.pillar === pl.id).map(x => `<button data-tpl="${x.id}"><b>${esc(x.name)}</b><span>${esc(x.brief)}</span></button>`).join("")}</div>`).join("")}</div></div>`;
+    return `<div class="st-vwrap st-posts"><div class="st-phead2"><div><h1>${plan ? "Plan" : "Create"}</h1><p class="st-m">${plan ? "When posts go out, what each month covers, and the campaigns they belong to." : "Write posts, make the images, carousels and motion."}</p></div>
+      <div class="st-phead-r">${plan ? `<button class="st-btn" data-campnew>New campaign</button>` : ""}<button class="st-btn st-primary" data-pnew>New post</button></div></div>
+      <div class="st-phead">${plan ? ttabs([["calendar", "Calendar"], ["campaigns", "Campaigns", camps.length]], tab, "data-ptab") : ttabs([["queue", "Posts", posts.length], ["templates", "Templates", (window.HS_TEMPLATES || []).length]], tab, "data-ptab")}</div>${inner}</div>`;
   }
   function postCard(p) {
     return `<button class="st-post" data-popen="${p.id}"><span class="st-post-img">${p.img ? `<img src="${esc(src(p.img))}" alt="">` : `<span class="st-post-card" style="background:${esc(p.card.bg)};color:${esc(p.card.fg)}">${esc((p.card.text || p.texts[p.platform] || p.title || "").slice(0, 80))}</span>`}</span><span class="st-post-b"><span class="st-post-t">${esc(p.title || "Untitled")}</span><span class="st-post-m">${pdot(p.pillar)}<span>${p.date ? esc(fmtD(p.date)) + " · " : ""}${esc(PLAT[p.platform].name)}</span>${status(p.status)}</span></span></button>`;
@@ -50,17 +51,26 @@
     const c = campOf(p.camp), plats = Object.keys(PLAT).filter(k => k === p.platform || (p.texts[k] || "").trim());
     return `<button class="st-qrow" data-popen="${p.id}"><span class="st-qd">${p.date ? esc(fmtD(p.date)) : "<span class='st-m'>No date</span>"}</span><span class="st-qt">${pdot(p.pillar)}<b>${esc(p.title || "Untitled")}</b></span><span class="st-qp">${plats.map(k => PLAT[k].name).join(", ")}</span><span class="st-qc">${c ? esc(c.name) : ""}</span>${status(p.status)}</button>`;
   }
+  function planLine() {
+    const mo = new Date().toISOString().slice(0, 7), moName = new Date().toLocaleDateString("en-GB", { month: "long" }), T = (tgtDoc && tgtDoc.targets) || TGT_DEFAULT;
+    const inMonth = posts.filter(p => p.date && p.date.slice(0, 7) === mo && p.status !== "idea"), total = Object.values(T).reduce((x, y) => x + (+y || 0), 0);
+    return `<div class="st-plan2"><button class="st-plan2-s" data-planopen aria-expanded="${planOpen}"><b>${esc(moName)}</b><span>${inMonth.length} of ${total} planned</span><span class="st-plan2-dots">${PIL().map(pl => { const n = inMonth.filter(p => p.pillar === pl.id).length, t = +T[pl.id] || 0; return `<span title="${esc(pl.name)}: ${n} of ${t}">${Array.from({ length: Math.max(t, n) }, (_, i) => `<i style="--pc:${pl.color}" class="${i < n ? "on" : ""}"></i>`).join("")}</span>`; }).join("")}</span><span class="st-m">${planOpen ? "Hide" : "By pillar"}</span></button>
+      ${planOpen ? `<div class="st-plan2-g">${PIL().map(pl => { const n = inMonth.filter(p => p.pillar === pl.id).length, t = +T[pl.id] || 0;
+        return `<button class="st-plan2-c ${pfil === pl.id ? "on" : ""}" data-pfil="${pl.id}"><span class="st-pl">${pdot(pl.id)}${esc(pl.name)}</span><span class="st-plan2-n">${n} of ${tgtOpen ? `<input type="number" min="0" max="20" data-tgt="${pl.id}" value="${t}" aria-label="${esc(pl.name)} target" onclick="event.stopPropagation()">` : t}</span></button>`; }).join("")}<button class="st-link" data-tgtedit>${tgtOpen ? "Done" : "Edit targets"}</button></div>` : ""}</div>`;
+  }
+  function viewTemplates() {
+    const T = window.HS_TEMPLATES || [];
+    return `<p class="st-m st-tpl-lead">A template is a starting point: a brief, a text per platform and a first slide. Pick one and fill in what is in curly brackets.</p>
+      ${PIL().map(pl => { const list = T.filter(x => x.pillar === pl.id); if (!list.length) return ""; return `<section class="st-tpl-sec"><h2 class="st-pl">${pdot(pl.id)}${esc(pl.name)}<span class="st-m">${esc(pl.text)}</span></h2>
+        <div class="st-tpl-grid">${list.map(x => `<button class="st-tpl-card" data-tpl="${x.id}"><span class="st-tpl-prev" style="background:${esc(x.card.bg)};color:${lum(x.card.bg) > .5 ? "#131313" : "#F4F2ED"}"><span>${esc(x.card.text)}</span>${x.slides ? `<em>${x.slides.length} slides</em>` : ""}</span><b>${esc(x.name)}</b><span class="st-m">${esc(x.brief)}</span></button>`).join("")}</div></section>`; }).join("")}`;
+  }
   function viewQueue() {
     const vis = posts.filter(p => (!filter || p.status === filter) && (!pfil || p.pillar === pfil) && (!campOpen || p.camp === campOpen))
       .slice().sort((a, b) => (a.date ? 0 : 1) - (b.date ? 0 : 1) || (a.date || "").localeCompare(b.date || ""));
     const mo = new Date().toISOString().slice(0, 7), moName = new Date().toLocaleDateString("en-GB", { month: "long" }), T = (tgtDoc && tgtDoc.targets) || TGT_DEFAULT;
     const inMonth = posts.filter(p => p.date && p.date.slice(0, 7) === mo && p.status !== "idea"), total = Object.values(T).reduce((x, y) => x + (+y || 0), 0);
-    const plan = `<div class="st-plan2"><button class="st-plan2-s" data-planopen aria-expanded="${planOpen}"><b>${esc(moName)}</b><span>${inMonth.length} of ${total} planned</span><span class="st-plan2-dots">${PIL().map(pl => { const n = inMonth.filter(p => p.pillar === pl.id).length, t = +T[pl.id] || 0; return `<span title="${esc(pl.name)}: ${n} of ${t}">${Array.from({ length: Math.max(t, n) }, (_, i) => `<i style="--pc:${pl.color}" class="${i < n ? "on" : ""}"></i>`).join("")}</span>`; }).join("")}</span><span class="st-m">${planOpen ? "Hide" : "By pillar"}</span></button>
-      ${planOpen ? `<div class="st-plan2-g">${PIL().map(pl => { const n = inMonth.filter(p => p.pillar === pl.id).length, t = +T[pl.id] || 0;
-        return `<button class="st-plan2-c ${pfil === pl.id ? "on" : ""}" data-pfil="${pl.id}"><span class="st-pl">${pdot(pl.id)}${esc(pl.name)}</span><span class="st-plan2-n">${n} of ${tgtOpen ? `<input type="number" min="0" max="20" data-tgt="${pl.id}" value="${t}" aria-label="${esc(pl.name)} target" onclick="event.stopPropagation()">` : t}</span></button>`; }).join("")}<button class="st-link" data-tgtedit>${tgtOpen ? "Done" : "Edit targets"}</button></div>` : ""}</div>`;
     const chips = [pfil ? `<button class="st-fchip" data-pfil="${pfil}">${pdot(pfil)}${esc((pil(pfil) || {}).name || "")} <span aria-hidden="true">×</span></button>` : "", campOpen ? `<button class="st-fchip" data-campclear>${esc((campOf(campOpen) || {}).name || "")} <span aria-hidden="true">×</span></button>` : ""].join("");
-    return `${plan}
-      <div class="st-qbar">${ttabs([["", "All", posts.length], ...STATUS.map(s => [s, { idea: "Ideas", draft: "Drafts", scheduled: "Scheduled", published: "Published" }[s], posts.filter(p => p.status === s).length])], filter, "data-pf")}${chips}<div class="st-qview">${ttabs([["list", "List"], ["grid", "Grid"]], qview, "data-qview")}</div></div>
+    return `<div class="st-qbar">${ttabs([["", "All", posts.length], ...STATUS.map(s => [s, { idea: "Ideas", draft: "Drafts", scheduled: "Scheduled", published: "Published" }[s], posts.filter(p => p.status === s).length])], filter, "data-pf")}${chips}<div class="st-qview">${ttabs([["list", "List"], ["grid", "Grid"]], qview, "data-qview")}</div></div>
       ${vis.length ? (qview === "grid" ? `<div class="st-pgrid">${vis.map(postCard).join("")}</div>` : `<div class="st-qlist"><div class="st-qrow st-qhead" aria-hidden="true"><span>Date</span><span>Post</span><span>Channels</span><span>Campaign</span><span>Status</span></div>${vis.map(postRow).join("")}</div>`) : `<p class="st-empty-p">Nothing here yet. Start from a template, or write a new post.</p>`}`;
   }
   // place timeline labels in rows so none overlap, measured at the card's real width
@@ -79,18 +89,25 @@
     });
   }
   let lmT; window.addEventListener("resize", () => { clearTimeout(lmT); lmT = setTimeout(layoutMarks, 80); });
+  function viewCalendar() {
+    const m = month || new Date().toISOString().slice(0, 7), [y, mo] = m.split("-").map(Number), first = new Date(y, mo - 1, 1), start = (first.getDay() + 6) % 7, days = new Date(y, mo, 0).getDate(), today = new Date().toISOString().slice(0, 10);
+    const ym = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`, prev = ym(new Date(y, mo - 2, 1)), next = ym(new Date(y, mo, 1));
+    const cells = []; for (let i = 0; i < start; i++) cells.push(""); for (let d = 1; d <= days; d++) cells.push(`${m}-${String(d).padStart(2, "0")}`);
+    const campBars = camps.filter(c => c.from && c.to && c.from <= `${m}-31` && c.to >= `${m}-01`);
+    return `<div class="st-prow"><button class="st-link" data-month="${prev}" aria-label="Previous month">←</button><h2 class="st-cal-h">${first.toLocaleDateString("en-GB", { month: "long", year: "numeric" })}</h2><button class="st-link" data-month="${next}" aria-label="Next month">→</button><button class="st-link" data-month="${ym(new Date())}">Today</button>${campBars.length ? `<span class="st-m">${campBars.map(c => `<span class="st-tag st-camp-tag">${esc(c.name)}</span>`).join(" ")}</span>` : ""}</div>
+      <div class="st-cal"><div class="st-cal-dow">${["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map(d => `<span>${d}</span>`).join("")}</div><div class="st-cal-grid">${cells.map(d => d ? `<div class="st-cal-day ${d === today ? "today" : ""}" data-calday="${d}"><span class="st-cal-n">${+d.slice(-2)}</span>${campBars.filter(c => c.from <= d && c.to >= d).map(c => `<i class="st-cal-camp" title="${esc(c.name)}"></i>`).join("")}${posts.filter(p => p.date === d).map(p => `<button class="st-cal-post st-s-${p.status}" data-popen="${p.id}" title="${esc(p.title)}${p.pillar ? " · " + esc((pil(p.pillar) || {}).name || "") : ""}">${p.pillar ? `<i class="st-pdot" style="--pc:${(pil(p.pillar) || {}).color}"></i>` : ""}${esc(PLAT[p.platform].name.slice(0, 2).toUpperCase())} · ${esc(p.title || "Untitled")}</button>`).join("")}</div>` : `<div class="st-cal-day st-cal-empty"></div>`).join("")}</div></div><p class="st-m">Click a day to add a post on it. The line at the top of a day is a campaign.</p>`;
+  }
   function viewCampaigns() {
     const today = new Date().toISOString().slice(0, 10);
     const span = c => { if (!c.from || !c.to) return ""; const d = Math.round((new Date(c.to) - new Date(c.from)) / 864e5) + 1; return d >= 14 ? `${Math.round(d / 7)} weeks` : `${d} days`; };
     const legend = `<div class="st-cmp-leg">${STATUS.map(status).join("")}</div>`;
-    return `<div class="st-qbar"><span class="st-m">A campaign groups posts around one goal and a period.</span><button class="st-link st-qbar-r" data-campnew>New campaign</button></div>
-      <div class="st-camps2">${camps.map(c => { const ps = posts.filter(p => p.camp === c.id).sort((a, b) => (a.date || "").localeCompare(b.date || "")), pub = ps.filter(p => p.status === "published").length, sch = ps.filter(p => p.status === "scheduled").length, clicks = ps.reduce((a, p) => a + clicksOf(stats, p.id), 0);
+    return `<div class="st-camps2">${camps.map(c => { const ps = posts.filter(p => p.camp === c.id).sort((a, b) => (a.date || "").localeCompare(b.date || "")), pub = ps.filter(p => p.status === "published").length, sch = ps.filter(p => p.status === "scheduled").length, clicks = ps.reduce((a, p) => a + clicksOf(stats, p.id), 0);
         const t0 = c.from ? Date.parse(c.from) : 0, t1 = c.to ? Date.parse(c.to) : 0, len = t1 > t0 ? t1 - t0 : 0;
         const pos = d => Math.max(0, Math.min(100, (Date.parse(d) - t0) / len * 100));
         const weeks = []; if (len) for (let t = t0; t <= t1 - 3 * 864e5; t += 7 * 864e5) weeks.push(new Date(t).toISOString().slice(0, 10));
         const dated = ps.filter(p => p.date), undated = ps.filter(p => !p.date);
         const line = len ? `<div class="st-cmp-tl">
-            <div class="st-cmp-axis">${weeks.map(w => `<span class="st-cmp-wk" style="left:${pos(w)}%">${esc(fmtD(w))}</span>`).join("")}<span class="st-cmp-wk st-cmp-end" style="left:100%">${esc(fmtD(c.to))}</span>${dated.map(p => `<i class="st-cmp-ad st-st-${p.status}" style="left:${pos(p.date)}%"></i>`).join("")}${today >= c.from && today <= c.to ? `<i class="st-cmp-today" style="left:${pos(today)}%"><span>Today</span></i>` : ""}</div>
+            <div class="st-cmp-axis">${weeks.map(w => `<span class="st-cmp-wk" style="left:${pos(w)}%">${esc(fmtD(w))}</span>`).join("")}<span class="st-cmp-wk st-cmp-end" style="left:100%">${esc(fmtD(c.to))}</span>${dated.map(p => `<i class="st-cmp-ad st-st-${p.status}" style="left:${pos(p.date)}%"></i><i class="st-cmp-tick" style="left:${pos(p.date)}%"></i>`).join("")}${today >= c.from && today <= c.to ? `<i class="st-cmp-today" style="left:${pos(today)}%"><span>Today</span></i>` : ""}</div>
             <div class="st-cmp-marks">${dated.map((p, i) => `<button class="st-cmp-mk st-st-${p.status} ${pos(p.date) > 70 ? "end" : ""}" data-x="${pos(p.date)}" style="left:${pos(p.date)}%" data-popen="${p.id}" title="${esc(fmtD(p.date))}, ${esc(SNAME[p.status])}"><i></i><span><b>${esc(p.title || "Untitled")}</b><em>${esc(fmtD(p.date))} · ${esc(PLAT[p.platform].name)}</em></span></button>`).join("")}</div>
           </div>` : `<p class="st-m">Set the dates to see the posts on a timeline.</p>`;
         return `<article class="st-cmp">
@@ -106,7 +123,7 @@
           <footer class="st-cmp-f">${legend}<details class="st-cmp-notes"><summary>Notes</summary><textarea class="st-ghost" data-ck="notes" data-cid="${c.id}" rows="2" placeholder="Angle, references, who approves.">${esc(c.notes)}</textarea><button class="st-link st-danger" data-campdel="${c.id}">Delete campaign</button></details></footer>
         </article>`; }).join("") || `<p class="st-empty-p">No campaigns yet. A campaign groups posts around one goal and a period, like a launch or a month on one topic.</p>`}</div>`;
   }
-  // ---- site analytics: its own view in the side menu, about the public site ----
+  // ---- site analytics: its own view in the side menu, about huit.studio ----
   let range = 30, soc = null, socDoc = null;
   const CN = { DE: "Germany", US: "United States", GB: "United Kingdom", FR: "France", CH: "Switzerland", AT: "Austria", NL: "Netherlands", ES: "Spain", IT: "Italy", PT: "Portugal", SE: "Sweden", DK: "Denmark", PL: "Poland", BE: "Belgium", CA: "Canada", AU: "Australia", IN: "India", BR: "Brazil", SG: "Singapore", AE: "United Arab Emirates", JP: "Japan", IE: "Ireland", NO: "Norway", FI: "Finland", CZ: "Czechia" };
   const cname = c => CN[c] || c;
@@ -162,37 +179,42 @@
   function spark(vals) { const W = 300, H = 36, mx = Math.max(...vals), mn = Math.min(...vals), r = mx - mn || 1; const pts = vals.map((v, i) => `${(i / (vals.length - 1) * W).toFixed(1)},${(H - 3 - (v - mn) / r * (H - 6)).toFixed(1)}`).join(" "); return `<svg class="st-spark" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true"><polyline points="${pts}" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>`; }
   function editor(box, p) {
     const pl = PLAT[p.platform], txt = p.texts[p.platform] || "", over = txt.length > pl.max, m = p.metrics[p.platform] || {}, clicks = clicksOf(stats, p.id);
-    const tracked = `${location.origin}/l/${p.id}?p=${p.platform}`;
-    box.innerHTML = `<div class="st-vwrap st-posts"><div class="st-prow"><button class="st-btn" data-pback>← Posts</button>${ttabs(STATUS.map(x => [x, SNAME[x]]), p.status, "data-pstatus")}<div class="st-pils">${PIL().map(pl => `<button class="st-pil ${p.pillar === pl.id ? "on" : ""}" style="--pc:${pl.color}" data-ppil="${pl.id}" title="${esc(pl.text)}">${esc(pl.name)}</button>`).join("")}</div><select class="st-in st-psel" data-pcamp><option value="">No campaign</option>${camps.map(c => `<option value="${c.id}" ${p.camp === c.id ? "selected" : ""}>${esc(c.name)}</option>`).join("")}</select><button class="st-mini st-txt st-danger" data-pdel>Delete</button></div>
+    const tracked = `${location.origin}/l/${p.id}?p=${p.platform}`, camp = campOf(p.camp);
+    box.innerHTML = `<div class="st-vwrap st-posts st-ed">
+      <div class="st-ed-top"><button class="st-link" data-pback>← Create</button><span class="st-ed-actions">${ttabs(STATUS.map(x => [x, SNAME[x]]), p.status, "data-pstatus")}<button class="st-link st-danger" data-pdel>Delete</button></span></div>
+      <input class="st-ghost st-ed-title" data-pk="title" value="${esc(p.title)}" placeholder="Working title" aria-label="Title">
+      <div class="st-ed-meta">
+        <span class="st-ed-mitem"><span class="st-m">Pillar</span><span class="st-pils">${PIL().map(x => `<button class="st-pil ${p.pillar === x.id ? "on" : ""}" style="--pc:${x.color}" data-ppil="${x.id}" title="${esc(x.text)}">${pdot(x.id)}${esc(x.name)}</button>`).join("")}</span></span>
+        <span class="st-ed-mitem"><span class="st-m">Campaign</span><select class="st-ghost st-ed-sel" data-pcamp aria-label="Campaign"><option value="">None</option>${camps.map(c => `<option value="${c.id}" ${p.camp === c.id ? "selected" : ""}>${esc(c.name)}</option>`).join("")}</select></span>
+        <span class="st-ed-mitem"><span class="st-m">Date</span><input class="st-ghost st-ed-date" type="date" data-pk="date" value="${esc(p.date)}" aria-label="Date"></span>
+      </div>
       <div class="st-ped">
-        <div class="st-pleft">
-          <input class="st-in st-ptitle" data-pk="title" value="${esc(p.title)}" placeholder="Working title">
-          <label class="st-field"><span>Brief <em>What is this post about, for whom, with what point?</em></span><textarea class="st-in" data-pk="brief" rows="3" placeholder="e.g. We launched the Chart builder. Say what it does, who it's for, link in comments.">${esc(p.brief)}</textarea></label>
-          <div class="st-prow"><div class="st-seg">${Object.keys(PLAT).map(k => `<button class="${p.platform === k ? "on" : ""}" data-pplat="${k}">${PLAT[k].name}${p.texts[k] ? " ●" : ""}</button>`).join("")}</div><div class="st-seg"><button class="${p.lang === "en" ? "on" : ""}" data-plang="en">EN</button><button class="${p.lang === "de" ? "on" : ""}" data-plang="de">DE</button></div><button class="st-btn" data-pai>Draft with AI</button></div>
-          <label class="st-field"><span>${esc(pl.name)} text <em class="${over ? "st-over" : ""}">${txt.length} / ${pl.max}</em></span><textarea class="st-in st-ptext" data-ptext rows="12" placeholder="Write, or press Draft with AI. The tone of voice from the side menu applies. {link} becomes the tracked link when you copy.">${esc(txt)}</textarea></label>
-          <div class="st-prow"><button class="st-btn" data-pcopy>Copy text</button><a class="st-btn" href="${esc(pl.url)}" target="_blank" rel="noopener">Open ${esc(pl.name)} ↗</a><label class="st-field st-pdate"><span>Date</span><input class="st-in" type="date" data-pk="date" value="${esc(p.date)}"></label></div>
-          <label class="st-field"><span>Link <em>where the post should send people</em></span><input class="st-in" data-pk="link" value="${esc(p.link)}" placeholder="/tools or https://huit.studio/work/kpk"></label>
-          <div class="st-tracked"><span class="st-m">Tracked link for ${esc(pl.name)}, counts clicks:</span><code>${esc(tracked)}</code><button class="st-mini st-txt" data-copytracked="${esc(tracked)}">Copy</button><span class="st-m">${num(clicks)} clicks so far</span></div>
-          <div class="st-field"><span>${esc(pl.name)} numbers <em>enter by hand after posting</em></span><div class="st-metrics"><label><span class="st-m">Impressions</span><input class="st-in" type="number" min="0" data-pm="impressions" value="${esc(m.impressions || "")}"></label><label><span class="st-m">Likes</span><input class="st-in" type="number" min="0" data-pm="likes" value="${esc(m.likes || "")}"></label><label><span class="st-m">Comments</span><input class="st-in" type="number" min="0" data-pm="comments" value="${esc(m.comments || "")}"></label></div></div>
-          <label class="st-field"><span>Notes</span><textarea class="st-in" data-pk="notes" rows="2" placeholder="Assets, who approves.">${esc(p.notes)}</textarea></label>
+        <div class="st-pleft st-ed-write">
+          <textarea class="st-ghost st-ed-brief" data-pk="brief" rows="1" placeholder="Brief: what is this post about, for whom, with what point?" aria-label="Brief">${esc(p.brief)}</textarea>
+          <div class="st-ed-plat">${ttabs(Object.keys(PLAT).map(k => [k, PLAT[k].name + ((p.texts[k] || "").trim() ? " ●" : "")]), p.platform, "data-pplat")}<button class="st-link" data-pai>Draft with AI</button></div>
+          <textarea class="st-ghost st-ed-text" data-ptext rows="10" placeholder="Write the ${esc(pl.name)} post, or draft it with AI. {link} becomes the tracked link when you copy." aria-label="${esc(pl.name)} text">${esc(txt)}</textarea>
+          <div class="st-ed-under"><span class="st-m ${over ? "st-over" : ""}"><em>${txt.length}</em> / ${pl.max}</span><button class="st-link" data-pcopy>Copy text</button><a class="st-link" href="${esc(pl.url)}" target="_blank" rel="noopener">Open ${esc(pl.name)} ↗</a></div>
+          <div class="st-ed-link"><span class="st-m">Link</span><input class="st-ghost" data-pk="link" value="${esc(p.link)}" placeholder="/tools or https://…" aria-label="Link target"><span class="st-ed-tracked"><span class="st-m">Tracked:</span><code>${esc(tracked.replace(/^https?:\/\//, ""))}</code><button class="st-link" data-copytracked="${esc(tracked)}">Copy</button>${clicks ? `<span class="st-m">${num(clicks)} clicks</span>` : ""}</span></div>
+          <textarea class="st-ghost st-ed-notes" data-pk="notes" rows="1" placeholder="Notes: assets, who approves." aria-label="Notes">${esc(p.notes)}</textarea>
+          ${p.status === "published" ? `<div class="st-ed-after"><span class="st-m">After posting, ${esc(pl.name)}</span><div class="st-metrics">${[["impressions", "Impressions"], ["likes", "Likes"], ["comments", "Comments"]].map(([k, l]) => `<label><span class="st-m">${l}</span><input class="st-ghost" type="number" min="0" data-pm="${k}" value="${esc(m[k] || "")}" placeholder="0"></label>`).join("")}</div></div>` : ""}
         </div>
         <div class="st-pright st-creator">
           ${creator(p)}
         </div>
       </div></div>`;
-    drawAll(p);
+    drawAll(p); const ta = box.querySelector(".st-ed-text"); if (ta) { ta.style.height = "auto"; ta.style.height = Math.max(220, ta.scrollHeight) + "px"; }
   }
   // ---- creator: one image, a carousel of slides, or a motion piece of scenes ----
   const FORMATS = { image: "Image", carousel: "Carousel", motion: "Motion" };
   const SIZES = { image: null, carousel: [["4:5", 1080, 1350], ["1:1", 1080, 1080]], motion: [["9:16", 1080, 1920], ["4:5", 1080, 1350], ["16:9", 1920, 1080]] };
-  const newSlide = (over) => Object.assign({ text: "", sub: "", label: "noa", bg: "#131313", fg: "#F4F2ED", img: "", fit: "cover", dim: true, align: "left", pos: "bottom", hsize: "L", showText: true, dur: 4, trans: "fade", pic: "float", textIn: "lines" }, over || {});
+  const newSlide = (over) => Object.assign({ text: "", sub: "", label: "Studio Huit", bg: "#131313", fg: "#F4F2ED", img: "", fit: "cover", dim: true, align: "left", pos: "bottom", hsize: "L", showText: true, dur: 4, trans: "fade", pic: "float", textIn: "lines" }, over || {});
   // older posts have p.card only; lift it into slides
-  function slidesOf(p) { if (!p.slides || !p.slides.length) { p.slides = [newSlide({ text: p.card.text || "", label: p.card.label || "noa", bg: p.card.bg, fg: p.card.fg, img: p.img || "" })]; } p.format = p.format || "image"; p.cur = Math.min(p.cur || 0, p.slides.length - 1); p.ptab = p.ptab || "text"; return p.slides; }
+  function slidesOf(p) { if (!p.slides || !p.slides.length) { p.slides = [newSlide({ text: p.card.text || "", label: p.card.label || "Studio Huit", bg: p.card.bg, fg: p.card.fg, img: p.img || "" })]; } p.format = p.format || "image"; p.cur = Math.min(p.cur || 0, p.slides.length - 1); p.ptab = p.ptab || "text"; return p.slides; }
   const cur = p => slidesOf(p)[p.cur];
   function sizeOf(p) { const list = SIZES[p.format] || PLAT[p.platform].sizes; return list[Math.min(p.card.size || 0, list.length - 1)]; }
   // keep the queue card and the AI brief in sync with slide 1
   function syncCard(p) { const s = slidesOf(p)[0]; p.card.text = s.text; p.card.bg = s.bg; p.card.fg = s.fg; p.card.label = s.label; p.img = s.img; }
-  const seg = (name, key, opts, val) => `<div class="st-field"><span>${name}</span><div class="st-steps">${opts.map(([v, l]) => `<button class="${String(val) === String(v) ? "on" : ""}" data-sk="${key}" data-sv="${esc(String(v))}">${l}</button>`).join("")}</div></div>`;
+  const seg = (name, key, opts, val) => `<div class="st-cr-row"><span class="st-m">${name}</span><div class="st-ttabs st-ttabs-s">${opts.map(([v, l]) => `<button class="${String(val) === String(v) ? "on" : ""}" data-sk="${key}" data-sv="${esc(String(v))}">${l}</button>`).join("")}</div></div>`;
   function creator(p) {
     const sl = slidesOf(p), s = cur(p), many = p.format !== "image", list = SIZES[p.format] || PLAT[p.platform].sizes, sz = sizeOf(p);
     const total = sl.reduce((a, x) => a + (+x.dur || 4), 0);
@@ -200,33 +222,33 @@
     const ch = s.chart || { type: "bar", unit: "", data: "" };
     const panel = p.ptab === "chart" ? `
           ${seg("Chart", "chart.type", [["none", "None"], ["bar", "Bars"], ["line", "Line"]], s.chart && s.chart.data ? ch.type : "none")}
-          <label class="st-field"><span>Numbers <em>one per line: label, value</em></span><textarea class="st-in" data-sk="chart.data" rows="6" placeholder="2023, 12\n2024, 18\n2025, 27">${esc(ch.data || "")}</textarea></label>
-          <label class="st-field"><span>Unit <em>shown after each value</em></span><input class="st-in" data-sk="chart.unit" value="${esc(ch.unit || "")}" placeholder="%, €, k"></label>
+          <div class="st-cr-row"><span class="st-m">Numbers</span><textarea class="st-ghost st-mono" data-sk="chart.data" rows="5" placeholder="label, value, one per line">${esc(ch.data || "")}</textarea></div>
+          <div class="st-cr-row"><span class="st-m">Unit</span><input class="st-ghost" data-sk="chart.unit" value="${esc(ch.unit || "")}" placeholder="%, €, k"></div>
           <p class="st-m">Drawn in the slide's colours between the label and the text. Put the text at the bottom and keep it short so the chart has room. Name the source in the line under the heading.</p>`
       : p.ptab === "picture" ? `
-          <div class="st-prow"><button class="st-btn" data-supload>${s.img ? "Replace picture" : "Add a picture"}</button>${s.img ? `<button class="st-mini st-txt" data-simgdel>Remove</button>` : ""}</div>
-          ${s.img ? seg("Fit", "fit", [["cover", "Fill"], ["inset", "Inset"]], s.fit) + `<label class="st-check"><span>Darken behind the text</span><input type="checkbox" data-sk="dim" ${s.dim !== false ? "checked" : ""}></label>` : `<p class="st-m">No picture on this slide, the colour is the ground. Dithered or printed-looking images sit well here.</p>`}`
+          <div class="st-cr-row"><span class="st-m">Picture</span><span><button class="st-btn" data-supload>${s.img ? "Replace" : "Add a picture"}</button>${s.img ? ` <button class="st-link" data-simgdel>Remove</button>` : ""}</span></div>
+          ${s.img ? seg("Fit", "fit", [["cover", "Fill"], ["inset", "Inset"]], s.fit) + `<div class="st-cr-row"><span class="st-m">Shade</span><label class="st-check"><input type="checkbox" data-sk="dim" ${s.dim !== false ? "checked" : ""}> Darken behind the text</label></div>` : `<p class="st-m">No picture on this slide, the colour is the ground. Dithered or printed-looking images sit well here.</p>`}`
       : p.ptab === "colours" ? `
-          <div class="st-field"><span>Ground</span><div class="st-swrow">${brandColors().map(c => `<button class="st-swb ${s.bg === c.hex ? "on" : ""}" data-sbg="${esc(c.hex)}" style="background:${esc(c.hex)}" title="${esc(c.name)}" aria-label="${esc(c.name)}"></button>`).join("")}</div></div>
-          <div class="st-field"><span>Text</span><div class="st-swrow">${brandColors().map(c => `<button class="st-swb ${s.fg === c.hex ? "on" : ""}" data-sfg="${esc(c.hex)}" style="background:${esc(c.hex)}" title="${esc(c.name)}" aria-label="${esc(c.name)}"></button>`).join("")}</div></div>
-          ${many ? `<button class="st-btn" data-sapplyall="colours">Same colours on every slide</button>` : ""}`
+          <div class="st-cr-row"><span class="st-m">Ground</span><div class="st-swrow">${brandColors().map(c => `<button class="st-swb ${s.bg === c.hex ? "on" : ""}" data-sbg="${esc(c.hex)}" style="background:${esc(c.hex)}" title="${esc(c.name)}" aria-label="${esc(c.name)}"></button>`).join("")}</div></div>
+          <div class="st-cr-row"><span class="st-m">Text</span><div class="st-swrow">${brandColors().map(c => `<button class="st-swb ${s.fg === c.hex ? "on" : ""}" data-sfg="${esc(c.hex)}" style="background:${esc(c.hex)}" title="${esc(c.name)}" aria-label="${esc(c.name)}"></button>`).join("")}</div></div>
+          ${many ? `<button class="st-link" data-sapplyall="colours">Same colours on every slide</button>` : ""}`
       : p.ptab === "motion" ? `
           ${seg("This scene lasts", "dur", [[3, "3 s"], [4, "4 s"], [6, "6 s"], [8, "8 s"]], s.dur || 4)}
           ${seg("Into this scene", "trans", [["cut", "Cut"], ["fade", "Fade"], ["slide", "Slide"]], s.trans || "fade")}
           ${seg("Picture", "pic", [["still", "Still"], ["float", "Float"], ["rise", "Rise"]], s.pic || "float")}
           ${seg("Text comes in", "textIn", [["once", "At once"], ["lines", "Line by line"], ["after", "After the picture"]], s.textIn || "lines")}
-          <button class="st-btn" data-sapplyall="motion">Same motion on every scene</button>
+          <button class="st-link" data-sapplyall="motion">Same motion on every scene</button>
           <p class="st-m">${sl.length} scene${sl.length > 1 ? "s" : ""}, ${total} s in all. Export gives a WebM file; Instagram and LinkedIn take it, for X convert to MP4.</p>`
       : `
-          <label class="st-field"><span>Heading</span><textarea class="st-in" data-sk="text" rows="3" placeholder="Short. Leave empty to show only the picture.">${esc(s.text)}</textarea></label>
-          <label class="st-field"><span>Line under it <em>optional</em></span><input class="st-in" data-sk="sub" value="${esc(s.sub || "")}" placeholder="A source, a date, a second thought."></label>
-          <label class="st-field"><span>Label</span><input class="st-in" data-sk="label" value="${esc(s.label || "")}"></label>
+          <div class="st-cr-row"><span class="st-m">Heading</span><textarea class="st-ghost" data-sk="text" rows="2" placeholder="Short. Empty shows only the picture.">${esc(s.text)}</textarea></div>
+          <div class="st-cr-row"><span class="st-m">Line under</span><input class="st-ghost" data-sk="sub" value="${esc(s.sub || "")}" placeholder="A source, a date, a second thought"></div>
+          <div class="st-cr-row"><span class="st-m">Label</span><input class="st-ghost" data-sk="label" value="${esc(s.label || "")}"></div>
           ${seg("Heading size", "hsize", [["S", "S"], ["M", "M"], ["L", "L"], ["XL", "XL"]], s.hsize || "L")}
           ${seg("Alignment", "align", [["left", "Left"], ["center", "Centre"]], s.align || "left")}
           ${seg("Position", "pos", [["top", "Top"], ["center", "Centre"], ["bottom", "Bottom"]], s.pos || "bottom")}
-          <label class="st-check"><span>Show text on this slide</span><input type="checkbox" data-sk="showText" ${s.showText !== false ? "checked" : ""}></label>`;
+          <div class="st-cr-row"><span class="st-m">Text</span><label class="st-check"><input type="checkbox" data-sk="showText" ${s.showText !== false ? "checked" : ""}> Show on this slide</label></div>`;
     return `
-          <div class="st-prow st-wrap"><div class="st-seg">${Object.entries(FORMATS).map(([k, n]) => `<button class="${p.format === k ? "on" : ""}" data-sformat="${k}">${n}</button>`).join("")}</div><div class="st-seg">${list.map((z, i) => `<button class="${(p.card.size || 0) === i ? "on" : ""}" data-psize="${i}">${z[0]}</button>`).join("")}</div>${p.format === "motion" ? `<button class="st-btn" data-splay>▶ Play</button><span class="st-m" data-stime></span>` : ""}</div>
+          <div class="st-cr-top">${ttabs(Object.entries(FORMATS), p.format, "data-sformat")}<span class="st-cr-sizes">${ttabs(list.map((z, i) => [String(i), z[0]]), String(p.card.size || 0), "data-psize")}</span>${p.format === "motion" ? `<button class="st-link" data-splay>▶ Play</button><span class="st-m" data-stime></span>` : ""}</div>
           <div class="st-pcard-wrap ${sz[2] > sz[1] * 1.3 ? "tall" : ""}"><canvas id="pcanvas" class="st-pcanvas"></canvas></div>
           ${many ? `<div class="st-strip" role="list">${sl.map((x, i) => `<div class="st-thumb ${i === p.cur ? "on" : ""}" role="listitem"><button class="st-thumb-b" data-scur="${i}" aria-label="Slide ${i + 1}"><canvas class="st-thumb-c" data-thumb="${i}"></canvas></button><span class="st-m">${i + 1}${p.format === "motion" ? ` · ${x.dur || 4} s` : ""}</span>${sl.length > 1 ? `<span class="st-thumb-x"><button class="st-mini" data-smove="-1" title="Move left">‹</button><button class="st-mini" data-sdel title="Remove">×</button><button class="st-mini" data-smove="1" title="Move right">›</button></span>` : ""}</div>`).join("")}<button class="st-thumb st-thumb-add" data-sadd><span class="st-thumb-c">+</span><span class="st-m">Add</span></button></div>` : ""}
           <div class="st-tabs">${tabs.map(([k, n]) => `<button class="${p.ptab === k ? "on" : ""}" data-sptab="${k}">${n}</button>`).join("")}</div>
@@ -245,7 +267,7 @@
     const sz = sizeOf(p); document.querySelectorAll("[data-thumb]").forEach(t => { const s = slidesOf(p)[+t.dataset.thumb]; if (!s) return; const w = 96, h = Math.round(96 * sz[2] / sz[1]); t.width = w * 2; t.height = h * 2; t.style.width = w + "px"; t.style.height = h + "px"; window.HSC.draw(t.getContext("2d"), withSrc(s), w * 2, h * 2, 1, false, () => drawThumbs(p)); });
   }
   function downloadBlob(b, name) { const a = document.createElement("a"); a.href = URL.createObjectURL(b); a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 4000); }
-  const fname = (p, ext, i) => `noa-${p.format}-${(p.title || "post").toLowerCase().replace(/[^a-z0-9]+/g, "-")}${i != null ? "-" + (i + 1) : ""}.${ext}`;
+  const fname = (p, ext, i) => `huit-${p.format}-${(p.title || "post").toLowerCase().replace(/[^a-z0-9]+/g, "-")}${i != null ? "-" + (i + 1) : ""}.${ext}`;
   const setPath = (o, path, v) => { const ks = path.split("."); const l = ks.pop(); ks.reduce((a, k) => a[k], o)[l] = v; };
 
   function render(box) {
@@ -253,13 +275,14 @@
     if (open) { const p = posts.find(x => x.id === open); if (p) return editor(box, p); open = null; }
     if (!stats && tab !== "analytics") X.req("GET", "/api/stats?days=30").then(s => { stats = s; }).catch(() => {});
     setTimeout(layoutMarks, 0);
-    box.innerHTML = shell(tab === "calendar" ? viewCalendar() : tab === "campaigns" ? viewCampaigns() : viewQueue());
+    if (X.state.view === "plan") { if (tab === "queue") tab = "calendar"; box.innerHTML = shell(planLine() + (tab === "campaigns" ? viewCampaigns() : viewCalendar())); }
+    else { if (tab !== "templates") tab = "queue"; box.innerHTML = shell(tab === "templates" ? viewTemplates() : viewQueue()); }
   }
 
   document.addEventListener("click", async e => {
     const t = e.target, c = s => t.closest(s); if (!c("#st-view")) return;
     if (X.state.view === "stats") { if (c("[data-range]")) { range = +c("[data-range]").dataset.range; stats = null; analytics(); } if (c("[data-gov]")) { const b = $(`#st-side [data-view="posts"]`); if (b) b.click(); } return; }
-    if (X.state.view !== "posts") return;
+    if (X.state.view !== "posts" && X.state.view !== "plan") return;
     const p = posts.find(x => x.id === open);
     const openNew = n => { posts.unshift(n); sortPosts(); open = n.id; save(n); render(); const el = $(".st-ptitle"); if (el) el.focus(); };
     if (c("[data-ptab]")) { tab = c("[data-ptab]").dataset.ptab; open = null; return render(); }
@@ -268,13 +291,14 @@
     if (c("[data-qview]")) { qview = c("[data-qview]").dataset.qview; return render(); }
     if (c("[data-tgtedit]")) { tgtOpen = !tgtOpen; return render(); }
     if (c("[data-tgt]")) return;
+    if (c("[data-pfil]") && X.state.view === "plan") { pfil = c("[data-pfil]").dataset.pfil; X.state.view = "posts"; X.keep(); return window.HSV.render(); }
     if (c("[data-pfil]")) { const v = c("[data-pfil]").dataset.pfil; pfil = pfil === v ? "" : v; return render(); }
     if (c("[data-month]")) { month = c("[data-month]").dataset.month; return render(); }
     if (c("[data-campclear]")) { campOpen = null; return render(); }
-    if (c("[data-campnew]")) { const n = newCamp(); camps.push(n); save(n, "campaigns"); render(); const el = [...$("#st-view").querySelectorAll(".st-camp-name")].pop(); if (el) el.select(); return; }
+    if (c("[data-campnew]")) { tab = "campaigns"; const n = newCamp(); camps.push(n); save(n, "campaigns"); render(); const el = [...$("#st-view").querySelectorAll(".st-camp-name")].pop(); if (el) el.select(); return; }
     if (c("[data-campdel]")) { const b = c("[data-campdel]"); if (!b.dataset.sure) { b.dataset.sure = 1; b.textContent = "Click again to delete"; return; } const id = b.dataset.campdel; await X.req("DELETE", "/api/db/campaigns/" + id); camps = camps.filter(x => x.id !== id); posts.forEach(x => { if (x.camp === id) { x.camp = ""; save(x); } }); if (campOpen === id) campOpen = null; return render(); }
     if (c("[data-cch]")) { const b = c("[data-cch]"), cp = campOf(b.dataset.cid), k = b.dataset.cch; cp.channels = (cp.channels || []).includes(k) ? cp.channels.filter(x => x !== k) : [...(cp.channels || []), k]; save(cp, "campaigns"); return render(); }
-    if (c("[data-campopen]")) { campOpen = c("[data-campopen]").dataset.campopen; tab = "queue"; filter = ""; return render(); }
+    if (c("[data-campopen]")) { campOpen = c("[data-campopen]").dataset.campopen; filter = ""; X.state.view = "posts"; X.keep(); return window.HSV.render(); }
     if (c("[data-campadd]")) { const n = newPost(); n.camp = c("[data-campadd]").dataset.campadd; return openNew(n); }
     if (c("[data-tplopen]")) { const m = $(".st-tpl-menu"); m.hidden = !m.hidden; return; }
     if (c("[data-tpl]")) { const t = (window.HS_TEMPLATES || []).find(x => x.id === c("[data-tpl]").dataset.tpl); const n = newPost(); n.title = t.name; n.brief = t.brief; n.texts = Object.assign({}, t.texts); n.link = t.link; n.status = "draft"; n.card.text = t.card.text; n.card.bg = t.card.bg; n.card.fg = lum(t.card.bg) > .5 ? "#131313" : "#F4F2ED"; n.pillar = t.pillar || ""; if (t.slides && t.slides.length) { n.format = "carousel"; n.slides = t.slides.map(x => newSlide(Object.assign({ fg: lum(x.bg || "#131313") > .5 ? "#131313" : "#F4F2ED" }, x, x.chart ? { chart: Object.assign({}, x.chart) } : {}))); syncCard(n); } else n.slides = [newSlide({ text: t.card.text, bg: t.card.bg, fg: n.card.fg })]; return openNew(n); }
@@ -309,18 +333,18 @@
     if (c("[data-pdel]")) { const b = c("[data-pdel]"); if (!b.dataset.sure) { b.dataset.sure = 1; b.textContent = "Click again to delete"; return; } await X.req("DELETE", "/api/db/posts/" + p.id); posts = posts.filter(x => x !== p); open = null; return render(); }
     if (c("[data-pai]")) {
       const b = c("[data-pai]"); if (!p.brief.trim()) return X.toast("Write a brief first, one or two lines."); b.disabled = true; b.textContent = "Writing…";
-      try { const r = await X.req("POST", "/api/ai/post", { brief: p.brief + (p.link ? ` Include this link: ${location.origin}/l/${p.id}?p=${p.platform}` : ""), tone: tone(), platform: p.platform, lang: p.lang }); p.texts[p.platform] = r.text; save(p); render(); X.toast("Draft written. Edit it, it’s a start."); }
+      try { const r = await X.req("POST", "/api/ai/post", { lang: "en", brief: p.brief + (p.link ? ` Include this link: ${location.origin}/l/${p.id}?p=${p.platform}` : ""), tone: tone(), platform: p.platform }); p.texts[p.platform] = r.text; save(p); render(); X.toast("Draft written. Edit it, it’s a start."); }
       catch (err) { b.disabled = false; b.textContent = "Draft with AI"; X.toast(err.code === "no_ai" ? "AI isn’t switched on for this site yet." : "The draft failed. Try again."); }
       return;
     }
   });
   document.addEventListener("input", e => {
-    const el = e.target; if (X.state.view !== "posts" || !el.closest("#st-view")) return;
+    const el = e.target; if ((X.state.view !== "posts" && X.state.view !== "plan") || !el.closest("#st-view")) return;
     if (el.matches("[data-tgt]")) { tgtDoc.targets = tgtDoc.targets || {}; tgtDoc.targets[el.dataset.tgt] = Math.max(0, +el.value || 0); clearTimeout(saveT.tgt); saveT.tgt = setTimeout(async () => { const { id, updated, ...data } = tgtDoc; try { const r = await X.req("PUT", "/api/db/settings/pillars", { data, base: updated }); tgtDoc.updated = r.updated; mark("Saved"); } catch (err) { mark("Not saved"); } }, 500); return; }
     if (el.matches("[data-ck]")) { const cp = campOf(el.dataset.cid); if (!cp) return; cp[el.dataset.ck] = el.value; mark("Saving…"); save(cp, "campaigns"); return; }
     const p = posts.find(x => x.id === open); if (!p) return;
     if (el.matches("[data-pm]")) { p.metrics[p.platform] = p.metrics[p.platform] || {}; p.metrics[p.platform][el.dataset.pm] = +el.value || 0; mark("Saving…"); save(p); return; }
-    if (el.matches("[data-ptext]")) { p.texts[p.platform] = el.value; const pl = PLAT[p.platform], em = el.closest(".st-field").querySelector("em"); em.textContent = `${el.value.length} / ${pl.max}`; em.classList.toggle("st-over", el.value.length > pl.max); mark("Saving…"); save(p); return; }
+    if (el.matches("[data-ptext]")) { p.texts[p.platform] = el.value; const pl = PLAT[p.platform], wrap = el.parentElement.querySelector(".st-ed-under .st-m"); if (wrap) { wrap.querySelector("em").textContent = el.value.length; wrap.classList.toggle("st-over", el.value.length > pl.max); } el.style.height = "auto"; el.style.height = Math.max(220, el.scrollHeight) + "px"; mark("Saving…"); save(p); return; }
     if (el.matches("[data-sk]")) { const s = cur(p); const k = el.dataset.sk; if (k.startsWith("chart.")) { s.chart = s.chart || { type: "bar", unit: "", data: "" }; s.chart[k.slice(6)] = el.value; } else s[k] = el.type === "checkbox" ? el.checked : el.value; syncCard(p); mark("Saving…"); save(p); const c2 = $("#pcanvas"); if (c2) { const sz = sizeOf(p); window.HSC.draw(c2.getContext("2d"), withSrc(s), sz[1], sz[2], 1, false); drawThumbs(p); } return; }
     if (el.matches("[data-pk]")) { setPath(p, el.dataset.pk, el.value); mark("Saving…"); save(p); }
   });
@@ -330,9 +354,11 @@
     const { id, updated, ...data } = socDoc; try { const r = await X.req("PUT", "/api/db/settings/social", { data, base: updated }); socDoc.updated = r.updated; X.toast("Logged."); } catch (err) { X.toast("Not saved."); }
     analytics();
   });
-  document.addEventListener("change", e => { const el = e.target; if (X.state.view !== "posts" || !el.closest("#st-view")) return; const p = posts.find(x => x.id === open); if (!p) return; if (el.matches("[data-pcamp]")) { p.camp = el.value; save(p); } if (el.matches("[data-pk=date]")) sortPosts(); });
+  document.addEventListener("change", e => { const el = e.target; if ((X.state.view !== "posts" && X.state.view !== "plan") || !el.closest("#st-view")) return; const p = posts.find(x => x.id === open); if (!p) return; if (el.matches("[data-pcamp]")) { p.camp = el.value; save(p); } if (el.matches("[data-pk=date]")) sortPosts(); });
   const lum = hex => { const m = hex.match(/[0-9a-f]{2}/gi) || ["80", "80", "80"]; const [r, g, b] = m.map(x => parseInt(x, 16) / 255); return .2126 * r + .7152 * g + .0722 * b; };
 
-  window.HSP = { render, analytics };
-  load().then(() => { if (X.state.view === "posts") render(); }).catch(() => {});
+  const openPost = id => { open = id; X.state.view = "posts"; X.keep(); window.HSV.render(); };
+  const openCampaigns = () => { open = null; tab = "campaigns"; X.state.view = "plan"; X.keep(); window.HSV.render(); };
+  window.HSP = { render, analytics, data: () => ({ posts, camps }), openPost, openCampaigns };
+  load().then(() => { if (X.state.view === "posts" || X.state.view === "plan") render(); }).catch(() => {});
 })();
