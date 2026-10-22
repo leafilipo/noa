@@ -47,7 +47,7 @@
       let out = "";
       if (W.clock && W.clock.on !== false) out += card("clock", W.clock.corner || "tr", `<svg class="nf-clock" viewBox="0 0 48 48" aria-label="Berlin time"><circle cx="24" cy="24" r="22" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="24" cy="24" r="1.6" fill="currentColor"/><line class="nf-h" x1="24" y1="24" x2="24" y2="13" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><line class="nf-m" x1="24" y1="24" x2="24" y2="8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><span class="nf-w-t"><b data-clock="${esc(V.site.tz || "Europe/Berlin")}">--:--</b><i>${esc(W.clock.label || V.site.city || "Berlin")}</i></span>`);
       if (W.weather && W.weather.on !== false) out += card("weather", W.weather.corner || "tl", `<svg class="nf-sky" viewBox="0 0 48 48" aria-hidden="true"><g class="nf-sun"><circle cx="24" cy="24" r="8" fill="none" stroke="currentColor" stroke-width="1.5"/>${[0,45,90,135,180,225,270,315].map(a => `<line x1="24" y1="8" x2="24" y2="12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" transform="rotate(${a} 24 24)"/>`).join("")}</g><g class="nf-cloud" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M14 32h20a6 6 0 0 0 0-12 8 8 0 0 0-15.5-2A6.5 6.5 0 0 0 14 32z"/></g><g class="nf-rain" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="18" y1="36" x2="16" y2="41"/><line x1="24" y1="36" x2="22" y2="41"/><line x1="30" y1="36" x2="28" y2="41"/></g></svg><span class="nf-w-t"><b data-temp>--°</b><i data-sky>${esc(W.weather.label || "berlin sky")}</i></span>`);
-      if (W.stats && W.stats.on !== false) out += card("stats", W.stats.corner || "br", `<span class="nf-w-t nf-w-stats"><b><span data-snacks>0</span> snacks</b><i><span data-dist>0 m</span> crawled · <span data-awake>0:00</span> awake</i></span>`);
+      if (W.stats && W.stats.on !== false) out += card("stats", W.stats.corner || "br", `<span class="nf-w-t nf-w-stats"><b><span data-snacks>0 files</span> · <span data-coffee>0 coffees</span></b><i><span data-dist>0 m</span> crawled · <span data-awake>0:00</span> awake</i></span>`);
       if (W.now && W.now.on !== false) out += card("now", W.now.corner || "bl", `<span class="nf-w-dot" aria-hidden="true"></span><span class="nf-w-t"><b ${E ? 'data-f="site.widgets.now.text"' : ""}>${esc(W.now.text || "")}</b><i ${E ? 'data-f="site.widgets.now.label"' : ""}>${esc(W.now.label || "now")}</i></span>`);
       if (W.music && W.music.on !== false) { const m = W.music, link = m.href ? `<a class="nf-w-link" href="${esc(m.href)}" target="_blank" rel="noopener" aria-label="Listen">↗</a>` : "";
         card("music", m.corner || "bl", `<span class="nf-eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span class="nf-w-t"><b ${E ? 'data-f="site.widgets.music.title"' : ""}>${esc(m.title || "")}</b><i ${E ? 'data-f="site.widgets.music.artist"' : ""}>${esc(m.artist || "")}</i></span>${link}`, "nf-w-music"); }
@@ -396,7 +396,8 @@
   // ---- noa: the worm. Stacked outlined circles on paper, follows attention, eats what you drop, opens his field guide when you click his head. ----
   const creatures = [];
   function creature(root) {
-    const cv = root.querySelector("canvas"), card = root.querySelector(".nf-fg"), cap = root.querySelector(".nf-cap > span"), cnt = root.querySelector("[data-snacks]"), dist = root.querySelector("[data-dist]"), awake = root.querySelector("[data-awake]"); let walked = 0, born = performance.now(), lastStat = 0;
+    const cv = root.querySelector("canvas"), card = root.querySelector(".nf-fg"), cap = root.querySelector(".nf-cap > span"), cnt = root.querySelector("[data-snacks]"), dist = root.querySelector("[data-dist]"), awake = root.querySelector("[data-awake]"); let walked = 0, born = performance.now(), lastStat = 0, files = 0, coffees = 0, drops = 0, buzz = -99; const cof = root.querySelector("[data-coffee]");
+    const NAMES = ["logo_FINAL_v7.ai", "brief (2).pdf", "untitled folder", "moodboard.fig", "deck_v12_REAL.key", "invoice_draft.pdf", "Screenshot 2026.png", "fonts", "feedback_round3.docx", "assets_old", "export@2x.png", "do not open"];
     if (!cv || cv.dataset.on) return; cv.dataset.on = "1";
     const ctx = cv.getContext("2d"), reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
     let this_face = null, W = 0, H = 0, k = 1, N = 420, head = null, trail = [], snacks = [], eaten = 0, gulp = -9, nextBlink = 2, raf = 0, pts = [];
@@ -414,7 +415,7 @@
     cv.addEventListener("click", e => {
       const q = pos(e), h0 = pts[0];
       if (h0 && Math.hypot(q.x - h0.x, q.y - h0.y) < h0.r * 1.4) { if (card && !edit) card.hidden = !card.hidden; return; }
-      snacks.push({ x: q.x, y: q.y, b: performance.now() / 1000 });
+      drops++; const coffee = drops % 4 === 0, nm = NAMES[(drops * 7) % NAMES.length]; snacks.push({ x: q.x, y: q.y, b: performance.now() / 1000, kind: coffee ? "coffee" : (/\./.test(nm) ? "file" : "folder"), name: coffee ? "coffee" : nm });
     });
     if (card) { const x = card.querySelector("[data-fgclose]"); if (x) x.addEventListener("click", () => card.hidden = true); }
     function step(ms) {
@@ -423,12 +424,12 @@
       const dark = root.closest(".hs.dark"), ink = dark ? "#1A1A1A" : (col("--ink") || "#1A1A1A"), paper = dark ? "#E7E1DE" : (col("--bg") || "#DCD8D3");
       let tx, ty, chasing = false;
       if (snacks.length) { let best = null, bd = 1e9; for (const s of snacks) { const d = Math.hypot(s.x - head.x, s.y - head.y); if (d < bd) { bd = d; best = s; } } tx = best.x; ty = best.y; chasing = true;
-        if (bd < 22 * k) { snacks.splice(snacks.indexOf(best), 1); eaten++; N += 18; gulp = t; if (cap) cap.textContent = base.replace(/he is .*$/, "") + `he has eaten ${eaten} ${eaten === 1 ? "snack" : "snacks"}.`; if (cnt) cnt.textContent = eaten; } }
+        if (bd < 22 * k) { snacks.splice(snacks.indexOf(best), 1); eaten++; N += 18; gulp = t; if (cap) cap.textContent = base.replace(/he is .*$/, "") + `he has eaten ${eaten} ${eaten === 1 ? "snack" : "snacks"}.`; if (best.kind === "coffee") { coffees++; buzz = t; } else files++; if (cnt) cnt.textContent = files + (files === 1 ? " file" : " files"); if (cof) cof.textContent = coffees + (coffees === 1 ? " coffee" : " coffees"); } }
       else if (ms - m.at < 2500) { tx = m.x; ty = m.y; }
       else { tx = W / 2 + Math.cos(t * .21) * W * .34 + Math.sin(t * .47) * W * .06; ty = H / 2 + Math.sin(t * .33) * H * .32 + Math.cos(t * .61) * H * .05; }
       if (!reduce) {
         const want = Math.atan2(ty - head.y, tx - head.x); let da = want - head.a; while (da > Math.PI) da -= Math.PI * 2; while (da < -Math.PI) da += Math.PI * 2;
-        const dist = Math.hypot(tx - head.x, ty - head.y), sp = (chasing ? 3.6 : 2.1) * k * Math.min(1, dist / (80 * k) + .3);
+        const dist = Math.hypot(tx - head.x, ty - head.y), sp = (chasing ? 3.6 : 2.1) * k * Math.min(1, dist / (80 * k) + .3) * (t - buzz < 6 ? 1.9 : 1); if (t - buzz < 6) head.a += (Math.random() - .5) * .12;
         const M = Math.min(W, H) * .18, R = 34 * k; let turn = Math.max(-.022, Math.min(.022, da));
         // near an edge: steer toward the centre, harder the closer he gets
         const ex = head.x < M ? (M - head.x) / M : head.x > W - M ? -(head.x - (W - M)) / M : 0, ey = head.y < M ? (M - head.y) / M : head.y > H - M ? -(head.y - (H - M)) / M : 0;
@@ -446,7 +447,13 @@
           pts.push({ x, y, r, a: prev ? Math.atan2(y - prev.y, x - prev.x) : head.a }); i++;
           need += r < 10 * k ? r * 2.05 : Math.max(5 * k, r * .24); } acc += seg; }
       ctx.clearRect(0, 0, W, H);
-      for (const s of snacks) { const w = 1 + Math.sin(t * 6 + s.b) * .15; ctx.fillStyle = ink; ctx.beginPath(); ctx.arc(s.x, s.y, 5 * k * w, 0, 7); ctx.fill(); ctx.strokeStyle = ink; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(s.x, s.y, 11 * k * w, 0, 7); ctx.stroke(); }
+      for (const s of snacks) { const bob = Math.sin(t * 3 + s.b) * 2 * k, x = s.x, y = s.y + bob, u = k;
+        ctx.lineWidth = 1.5 * k; ctx.strokeStyle = ink; ctx.fillStyle = paper; ctx.beginPath();
+        if (s.kind === "file") { ctx.moveTo(x - 11 * u, y - 14 * u); ctx.lineTo(x + 5 * u, y - 14 * u); ctx.lineTo(x + 11 * u, y - 8 * u); ctx.lineTo(x + 11 * u, y + 14 * u); ctx.lineTo(x - 11 * u, y + 14 * u); ctx.closePath(); ctx.fill(); ctx.stroke(); ctx.beginPath(); ctx.moveTo(x + 5 * u, y - 14 * u); ctx.lineTo(x + 5 * u, y - 8 * u); ctx.lineTo(x + 11 * u, y - 8 * u); ctx.stroke(); for (let l = 0; l < 3; l++) { ctx.beginPath(); ctx.moveTo(x - 6 * u, y - 2 * u + l * 5 * u); ctx.lineTo(x + 6 * u - (l === 2 ? 5 * u : 0), y - 2 * u + l * 5 * u); ctx.stroke(); } }
+        else if (s.kind === "folder") { ctx.moveTo(x - 14 * u, y - 9 * u); ctx.lineTo(x - 4 * u, y - 9 * u); ctx.lineTo(x - 1 * u, y - 5 * u); ctx.lineTo(x + 14 * u, y - 5 * u); ctx.lineTo(x + 14 * u, y + 11 * u); ctx.lineTo(x - 14 * u, y + 11 * u); ctx.closePath(); ctx.fill(); ctx.stroke(); ctx.beginPath(); ctx.moveTo(x - 14 * u, y - 1 * u); ctx.lineTo(x + 14 * u, y - 1 * u); ctx.stroke(); }
+        else { ctx.moveTo(x - 9 * u, y - 6 * u); ctx.lineTo(x + 9 * u, y - 6 * u); ctx.lineTo(x + 7 * u, y + 11 * u); ctx.quadraticCurveTo(x, y + 13 * u, x - 7 * u, y + 11 * u); ctx.closePath(); ctx.fill(); ctx.stroke(); ctx.beginPath(); ctx.arc(x + 11 * u, y + 2 * u, 4 * u, -Math.PI / 2, Math.PI / 2); ctx.stroke(); ctx.beginPath(); ctx.ellipse(x, y - 6 * u, 9 * u, 2.5 * u, 0, 0, 7); ctx.fillStyle = ink; ctx.fill();
+          for (let st = -1; st <= 1; st++) { const ph = t * 2 + st; ctx.beginPath(); ctx.moveTo(x + st * 4 * u, y - 10 * u); ctx.bezierCurveTo(x + st * 4 * u + Math.sin(ph) * 3 * u, y - 14 * u, x + st * 4 * u - Math.sin(ph) * 3 * u, y - 18 * u, x + st * 4 * u, y - 22 * u); ctx.globalAlpha = .5; ctx.stroke(); ctx.globalAlpha = 1; } }
+        ctx.fillStyle = ink; ctx.font = `${11 * k}px Geist, system-ui, sans-serif`; ctx.textAlign = "center"; ctx.fillText(s.name, x, y + 28 * u); }
       ctx.lineWidth = 1.5 * k; ctx.strokeStyle = ink;
       const gf = Math.max(0, 1 - (t - gulp) * 1.2), bulge = gf > 0 ? (1 - gf) * pts.length : -999;
       // Safari: one path per ring is slow. Rings only overlap their neighbours, so draw in two passes of batched paths (odd, then even): fill all, stroke all.
