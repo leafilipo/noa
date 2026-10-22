@@ -1,0 +1,20 @@
+{
+  "name": "noafilipo",
+  "main": "src/worker.js",
+  "compatibility_date": "2026-09-01",
+  "assets": { "directory": "./public", "binding": "ASSETS", "run_worker_first": true },
+  "d1_databases": [{ "binding": "DB", "database_name": "noafilipo", "database_id": "c8a540c6-8cfc-4999-b83f-2faeabd64b11" }],
+  "ai": { "binding": "AI" },
+  "workers_dev": true,
+  "preview_urls": false,
+  "vars": {
+    // the real domain(s) later: only the website is served there, the Studio stays on workers.dev
+    "PUBLIC_HOSTS": "",
+    "PUBLISHERS": "Lea",
+    "ACCESS_TEAM_DOMAIN": "studiohuit.cloudflareaccess.com",
+    // AUD of the Access app that protects /studio and /api on this Worker
+    "ACCESS_AUD": "",
+    "USERS": "{\"lea@huit.studio\":\"Lea\"}"
+  },
+  "observability": { "enabled": true }
+}
