@@ -98,7 +98,7 @@
       const to = a => { if (!a) { blob.style.width = "0"; return; } const pr = pill.getBoundingClientRect(), ar = a.getBoundingClientRect(); blob.style.left = (ar.left - pr.left) + "px"; blob.style.width = ar.width + "px"; };
       const home = () => { pill.querySelectorAll("a").forEach(x => x.classList.remove("lit")); to(pill.querySelector("a.on")); };
       pill.querySelectorAll("a").forEach(a => a.addEventListener("pointerenter", () => { pill.querySelectorAll("a").forEach(x => x.classList.remove("lit")); a.classList.add("lit"); to(a); }));
-      pill.addEventListener("pointerleave", home); blob.style.transition = "none"; home(); requestAnimationFrame(() => blob.style.transition = ""); }); site.querySelectorAll("[data-gallery]").forEach(r => window.HS.gallery(r));
+      pill.addEventListener("pointerleave", home); blob.style.transition = "none"; home(); requestAnimationFrame(() => { home(); blob.style.transition = ""; }); if (document.fonts) document.fonts.ready.then(home); }); site.querySelectorAll("[data-gallery]").forEach(r => window.HS.gallery(r));
     site.querySelectorAll("[data-bench]").forEach(g => { const path = g.closest("[data-sec]").dataset.sec + ".items"; window.HS.bench(g, {
       onGo: href => { if (!state.edit) go(href); },
       onOrder: ids => change(() => { const arr = get(V(), path); const next = ids.map(i => arr[i]); arr.splice(0, arr.length, ...next); }, true),

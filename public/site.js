@@ -407,7 +407,7 @@
     function step(ms) {
       if (!cv.isConnected) { ro.disconnect(); return; }
       const t = ms / 1000; if (!W) { raf = requestAnimationFrame(step); return; }
-      const ink = col("--ink") || "#1A1A1A", paper = col("--bg") || "#DCD8D3";
+      const dark = root.closest(".hs.dark"), ink = dark ? "#1A1A1A" : (col("--ink") || "#1A1A1A"), paper = dark ? "#E7E1DE" : (col("--bg") || "#DCD8D3");
       let tx, ty, chasing = false;
       if (snacks.length) { let best = null, bd = 1e9; for (const s of snacks) { const d = Math.hypot(s.x - head.x, s.y - head.y); if (d < bd) { bd = d; best = s; } } tx = best.x; ty = best.y; chasing = true;
         if (bd < 22 * k) { snacks.splice(snacks.indexOf(best), 1); eaten++; N += 18; gulp = t; if (cap) cap.textContent = base.replace(/he is .*$/, "") + `he has eaten ${eaten} ${eaten === 1 ? "snack" : "snacks"}.`; if (cnt) cnt.textContent = `${eaten} ${eaten === 1 ? "snack" : "snacks"}`; } }
