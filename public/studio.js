@@ -94,7 +94,7 @@
     stuck();
     site.querySelectorAll("[data-estimate]").forEach(r => window.HS.estimate(r));
     window.HS.creatures.splice(0).forEach(c => c.stop()); site.querySelectorAll("[data-creature]").forEach(r => window.HS.creature(r));
-  document.querySelectorAll("[data-date]").forEach(d => { try { d.textContent = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "Europe/Berlin" }).format(new Date()).toLowerCase(); } catch (e) {} });
+    window.HS.widgets(site);
     site.querySelectorAll(".nf-pill").forEach(pill => { const blob = document.createElement("span"); blob.className = "nf-blob"; pill.prepend(blob);
       const to = a => { if (!a) { blob.style.width = "0"; return; } const pr = pill.getBoundingClientRect(), ar = a.getBoundingClientRect(); blob.style.left = (ar.left - pr.left) + "px"; blob.style.width = ar.width + "px"; };
       const home = () => { pill.querySelectorAll("a").forEach(x => x.classList.remove("lit")); to(pill.querySelector("a.on")); };

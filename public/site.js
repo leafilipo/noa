@@ -41,6 +41,15 @@
     const chips = (path, cls) => `<div class="hs-chips ${cls || ""}">${items(path, q => f(q, "span", "hs-chip"), "word", "chip")}</div>`;
     const caseOf = slug => (V.cases || []).find(c => c.slug === slug);
 
+    // ---- noa: corner widgets. Settings live in site.widgets (on/off, corner, text); the runtime brings them to life. ----
+    const widgets = () => { const W = V.site.widgets || {}; const corners = { tl: "nf-w-tl", tr: "nf-w-tr", bl: "nf-w-bl", br: "nf-w-br" };
+      const card = (id, corner, inner, cls) => `<div class="nf-w ${corners[corner] || "nf-w-br"} ${cls || ""}" data-widget="${id}">${inner}</div>`;
+      let out = "";
+      if (W.clock && W.clock.on !== false) out += card("clock", W.clock.corner || "tr", `<svg class="nf-clock" viewBox="0 0 48 48" aria-label="Berlin time"><circle cx="24" cy="24" r="22" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="24" cy="24" r="1.6" fill="currentColor"/><line class="nf-h" x1="24" y1="24" x2="24" y2="13" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><line class="nf-m" x1="24" y1="24" x2="24" y2="8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><span class="nf-w-t"><b data-clock="${esc(V.site.tz || "Europe/Berlin")}">--:--</b><i>${esc(W.clock.label || V.site.city || "Berlin")}</i></span>`);
+      if (W.weather && W.weather.on !== false) out += card("weather", W.weather.corner || "tl", `<svg class="nf-sky" viewBox="0 0 48 48" aria-hidden="true"><g class="nf-sun"><circle cx="24" cy="24" r="8" fill="none" stroke="currentColor" stroke-width="1.5"/>${[0,45,90,135,180,225,270,315].map(a => `<line x1="24" y1="8" x2="24" y2="12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" transform="rotate(${a} 24 24)"/>`).join("")}</g><g class="nf-cloud" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M14 32h20a6 6 0 0 0 0-12 8 8 0 0 0-15.5-2A6.5 6.5 0 0 0 14 32z"/></g><g class="nf-rain" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="18" y1="36" x2="16" y2="41"/><line x1="24" y1="36" x2="22" y2="41"/><line x1="30" y1="36" x2="28" y2="41"/></g></svg><span class="nf-w-t"><b data-temp>--°</b><i data-sky>${esc(W.weather.label || "berlin sky")}</i></span>`);
+      if (W.stats && W.stats.on !== false) out += card("stats", W.stats.corner || "br", `<span class="nf-w-t nf-w-stats"><b><span data-snacks>0</span> snacks</b><i><span data-dist>0 m</span> crawled · <span data-awake>0:00</span> awake</i></span>`);
+      if (W.now && W.now.on !== false) out += card("now", W.now.corner || "bl", `<span class="nf-w-dot" aria-hidden="true"></span><span class="nf-w-t"><b ${E ? 'data-f="site.widgets.now.text"' : ""}>${esc(W.now.text || "")}</b><i ${E ? 'data-f="site.widgets.now.label"' : ""}>${esc(W.now.label || "now")}</i></span>`);
+      return out; };
     const S = {
       // text card + mark + feature project card
       // the bench: a strict grid of modules. Visitors drag them around and resize them; the brand stays fixed.
@@ -147,7 +156,7 @@
         return `<div class="nf-creature" data-creature="${esc(s.kind || "worm")}"><canvas aria-label="${esc(c.name || "A creature")} crawling across the page"></canvas>
           <aside class="nf-fg" ${E ? "" : "hidden"} aria-label="Field guide"><p class="nf-lab">Field guide · ${f(p + ".card.no", "span")}</p>${f(p + ".card.name", "h2", "nf-fg-name")}${f(p + ".card.latin", "p", "nf-fg-latin")}
             <dl>${row("habitat", "Habitat")}${row("behaviour", "Behaviour")}${row("diet", "Diet")}${row("observed", "First observed")}${row("status", "Status")}</dl>${fm(p + ".card.note", "nf-fg-note")}${E ? "" : `<button type="button" class="nf-fg-x" data-fgclose aria-label="Close field guide">×</button>`}</aside>
-          ${s.caption || s.hint || E ? `<div class="nf-cap">${f(p + ".caption", "span")}<span class="nf-cap-r">${f(p + ".hint", "span")}</span></div>` : ""}<span class="nf-count on" aria-live="polite">0 snacks</span><span class="nf-date" data-date></span></div>`; },
+          ${s.caption || s.hint || E ? `<div class="nf-cap">${f(p + ".caption", "span")}<span class="nf-cap-r">${f(p + ".hint", "span")}</span></div>` : ""}${widgets()}</div>`; },
       // ---- noa: specimens, the work as field guide cards ----
       specimens: (p, s) => { const list = (V.cases || []).map((c, i) => ({ c, i })).filter(x => !x.c.hidden || E);
         return `${(get(V, p + ".title") || E) ? `<div class="nf-head">${f(p + ".title", "h2", "nf-h2")}${(get(V, p + ".intro") || E) ? f(p + ".intro", "p", "nf-intro") : ""}</div>` : ""}
@@ -195,7 +204,7 @@
     // ---- noa: name, pill nav, city and time; a quiet footer ----
     const noaNav = cur => `<header class="nf-nav"><a class="nf-name" href="/"><span ${E ? 'data-f="site.name"' : ""}>${esc(V.site.name)}</span></a>
       <nav class="nf-pill" aria-label="Main">${(V.site.nav || []).map((n, i) => `<a href="${esc(n.href)}" class="${isOn(cur, n.href) ? "on" : ""}${n.href === "/" ? " nf-face" : ""}"${isOn(cur, n.href) ? ' aria-current="page"' : ""}${n.href === "/" ? ' aria-label="Home"' : ""}>${n.href === "/" ? FACE : ""}<span ${E ? `data-f="site.nav.${i}.label"` : ""}>${esc(n.label)}</span></a>`).join("")}</nav>
-      <span class="nf-where"><span ${E ? 'data-f="site.city"' : ""}>${esc(V.site.city)}</span> <span data-clock="${esc(V.site.tz || "Europe/Berlin")}">--:--</span></span></header>`;
+      <span class="nf-where"></span></header>`;
     const noaFoot = () => `<footer class="nf-foot"><a href="mailto:${esc(V.site.email)}"><span ${E ? 'data-f="site.email"' : ""}>${esc(V.site.email)}</span></a>
       ${(V.site.social || []).map((l, i) => `<a href="${esc(l.href)}" target="_blank" rel="noopener"${mark("data-href", `site.social.${i}.href`)}><span ${E ? `data-f="site.social.${i}.label"` : ""}>${esc(l.label)}</span></a>`).join("")}
       <span class="nf-grow"></span><button class="nf-theme" type="button" data-theme aria-label="Dark mode">dark / light</button><a href="/imprint">Imprint</a><a href="/privacy">Privacy</a></footer>`;
@@ -293,7 +302,7 @@
     sections: [{ t: "image", img: "", caption: "" }, { t: "pair", a: "", b: "" }, { t: "facts", items: [{ k: "Medium", v: "[code, 3D, motion]" }, { k: "Year", v: "2026" }] }] });
   const SEED = {
     name: "V1",
-    site: { name: "noa filipo", navStyle: "noa", email: "lea@huit.studio", city: "Berlin", tz: "Europe/Berlin", nav: [{ label: "work", href: "/" }, { label: "about", href: "/about" }, { label: "gallery", href: "/gallery" }, { label: "contact", href: "/contact" }],
+    site: { name: "noa filipo", navStyle: "noa", widgets: { clock: { on: true, corner: "tr", label: "Berlin" }, weather: { on: true, corner: "tl", label: "berlin sky" }, stats: { on: true, corner: "br" }, now: { on: true, corner: "bl", label: "now", text: "[what you are working on]" } }, email: "lea@huit.studio", city: "Berlin", tz: "Europe/Berlin", nav: [{ label: "work", href: "/" }, { label: "about", href: "/about" }, { label: "gallery", href: "/gallery" }, { label: "contact", href: "/contact" }],
       consent: { on: true, text: "This site sets no tracking cookies. It counts page views without identifying you.", accept: "Fine", decline: "No counting", more: "/cookies", moreLabel: "Cookies" },
       social: [{ label: "Instagram", href: "https://www.instagram.com/" }, { label: "X", href: "https://x.com/" }] },
     pages: {
@@ -385,7 +394,7 @@
   // ---- noa: the worm. Stacked outlined circles on paper, follows attention, eats what you drop, opens his field guide when you click his head. ----
   const creatures = [];
   function creature(root) {
-    const cv = root.querySelector("canvas"), card = root.querySelector(".nf-fg"), cap = root.querySelector(".nf-cap > span"), cnt = root.querySelector(".nf-count");
+    const cv = root.querySelector("canvas"), card = root.querySelector(".nf-fg"), cap = root.querySelector(".nf-cap > span"), cnt = root.querySelector("[data-snacks]"), dist = root.querySelector("[data-dist]"), awake = root.querySelector("[data-awake]"); let walked = 0, born = performance.now(), lastStat = 0;
     if (!cv || cv.dataset.on) return; cv.dataset.on = "1";
     const ctx = cv.getContext("2d"), reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
     let this_face = null, W = 0, H = 0, k = 1, N = 420, head = null, trail = [], snacks = [], eaten = 0, gulp = -9, nextBlink = 2, raf = 0, pts = [];
@@ -412,7 +421,7 @@
       const dark = root.closest(".hs.dark"), ink = dark ? "#1A1A1A" : (col("--ink") || "#1A1A1A"), paper = dark ? "#E7E1DE" : (col("--bg") || "#DCD8D3");
       let tx, ty, chasing = false;
       if (snacks.length) { let best = null, bd = 1e9; for (const s of snacks) { const d = Math.hypot(s.x - head.x, s.y - head.y); if (d < bd) { bd = d; best = s; } } tx = best.x; ty = best.y; chasing = true;
-        if (bd < 22 * k) { snacks.splice(snacks.indexOf(best), 1); eaten++; N += 18; gulp = t; if (cap) cap.textContent = base.replace(/he is .*$/, "") + `he has eaten ${eaten} ${eaten === 1 ? "snack" : "snacks"}.`; if (cnt) cnt.textContent = `${eaten} ${eaten === 1 ? "snack" : "snacks"}`; } }
+        if (bd < 22 * k) { snacks.splice(snacks.indexOf(best), 1); eaten++; N += 18; gulp = t; if (cap) cap.textContent = base.replace(/he is .*$/, "") + `he has eaten ${eaten} ${eaten === 1 ? "snack" : "snacks"}.`; if (cnt) cnt.textContent = eaten; } }
       else if (ms - m.at < 2500) { tx = m.x; ty = m.y; }
       else { tx = W / 2 + Math.cos(t * .21) * W * .34 + Math.sin(t * .47) * W * .06; ty = H / 2 + Math.sin(t * .33) * H * .32 + Math.cos(t * .61) * H * .05; }
       if (!reduce) {
@@ -422,7 +431,8 @@
         // near an edge: steer toward the centre, harder the closer he gets
         const ex = head.x < M ? (M - head.x) / M : head.x > W - M ? -(head.x - (W - M)) / M : 0, ey = head.y < M ? (M - head.y) / M : head.y > H - M ? -(head.y - (H - M)) / M : 0;
         if (ex || ey) { const wa = Math.atan2(ey || (H / 2 - head.y) / H, ex || (W / 2 - head.x) / W); let dd = wa - head.a; while (dd > Math.PI) dd -= Math.PI * 2; while (dd < -Math.PI) dd += Math.PI * 2; turn += Math.max(-.09, Math.min(.09, dd)) * Math.min(1, Math.hypot(ex, ey)); }
-        head.a += turn * .8; head.x += Math.cos(head.a) * sp; head.y += Math.sin(head.a) * sp;
+        head.a += turn * .8; head.x += Math.cos(head.a) * sp; head.y += Math.sin(head.a) * sp; walked += sp;
+        if (ms - lastStat > 1000) { lastStat = ms; if (dist) dist.textContent = Math.round(walked / 40) + " m"; if (awake) { const s = Math.floor((ms - born) / 1000); awake.textContent = Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0"); } }
         head.x = Math.max(R, Math.min(W - R, head.x)); head.y = Math.max(R, Math.min(H - R, head.y));
         if (Math.hypot(head.x - trail[0].x, head.y - trail[0].y) > .8) trail.unshift({ x: head.x, y: head.y }); if (trail.length > 20000) trail.length = 20000;
       }
@@ -457,5 +467,18 @@
     root.addEventListener("click", e => { const b = e.target.closest("[data-gf]"); if (!b) return; const k = b.dataset.gf;
       root.querySelectorAll("[data-gf]").forEach(x => x.classList.toggle("on", x === b));
       root.querySelectorAll(".nf-g-item").forEach(it => { it.hidden = !!k && it.dataset.kind !== k; }); }); }
-  window.HS = { gallery, creature, creatures, make, LIB, ITEM, SEED, newCase, routes, get, esc, slugify, src, bench, estimate };
+  // ---- noa: widgets. Clock hands on Berlin time; the sky from Open-Meteo (no key, nothing personal sent). ----
+  function widgets(root) { root = root || document;
+    const tz = (root.querySelector("[data-clock]") || {}).dataset ? root.querySelector("[data-clock]").dataset.clock : "Europe/Berlin";
+    const hands = () => { try { const p = new Intl.DateTimeFormat("en-GB", { hour: "numeric", minute: "numeric", second: "numeric", hour12: false, timeZone: tz }).formatToParts(new Date()); const g = k => +p.find(x => x.type === k).value; const h = g("hour") % 12, m = g("minute"), s = g("second");
+      root.querySelectorAll(".nf-clock").forEach(c => { c.querySelector(".nf-h").setAttribute("transform", `rotate(${(h + m / 60) * 30} 24 24)`); c.querySelector(".nf-m").setAttribute("transform", `rotate(${(m + s / 60) * 6} 24 24)`); }); } catch (e) {} };
+    if (root.querySelector(".nf-clock")) { hands(); setInterval(hands, 1000); }
+    const sky = root.querySelector("[data-widget=weather]");
+    if (sky) { const show = (code, temp) => { const t = sky.querySelector("[data-temp]"), s = sky.querySelector("[data-sky]"); if (t) t.textContent = Math.round(temp) + "°";
+        const cloudy = code >= 2 && code < 51, rain = code >= 51; sky.classList.toggle("is-cloud", cloudy); sky.classList.toggle("is-rain", rain); sky.classList.toggle("is-sun", code < 2);
+        if (s && !s.dataset.fixed) s.textContent = code < 2 ? "clear" : code < 4 ? "some clouds" : code < 51 ? "overcast" : code < 70 ? "rain" : code < 80 ? "snow" : "showers"; };
+      try { const k = "nf-sky", c = JSON.parse(localStorage.getItem(k) || "null"); if (c && Date.now() - c.at < 15 * 60e3) show(c.code, c.temp); } catch (e) {}
+      fetch("https://api.open-meteo.com/v1/forecast?latitude=52.52&longitude=13.405&current=temperature_2m,weather_code&timezone=Europe%2FBerlin").then(r => r.json()).then(d => { const code = d.current.weather_code, temp = d.current.temperature_2m; show(code, temp); try { localStorage.setItem("nf-sky", JSON.stringify({ at: Date.now(), code, temp })); } catch (e) {} }).catch(() => {}); }
+  }
+  window.HS = { widgets, gallery, creature, creatures, make, LIB, ITEM, SEED, newCase, routes, get, esc, slugify, src, bench, estimate };
 })();

@@ -4,7 +4,7 @@
   const X = window.HSX, { esc, get, src, slugify } = window.HS;
   const $ = (s, r) => (r || document).querySelector(s);
   const deep = o => JSON.parse(JSON.stringify(o));
-  const VIEWS = [["site", "Website", "M3 4h14v12H3z M3 8h14"], ["projects", "Projects", "M3 5h6l2 2h6v9H3z"], ["tone", "Tone of voice", "M4 15V5h12v8H8z"], ["brand", "Guides", "M10 3l2 4 4 1-3 3 1 4-4-2-4 2 1-4-3-3 4-1z"], ["refs", "References", "M8 12l4-4M6 14l-1 1a2 2 0 0 1-3-3l3-3a2 2 0 0 1 3 0M14 6l1-1a2 2 0 0 1 3 3l-3 3a2 2 0 0 1-3 0"], ["posts", "Posts", "M4 4h12v9H8l-4 3z"], ["stats", "Analytics", "M3 16h14M5 13V9M9 13V5M13 13V8M17 13V3"]];
+  const VIEWS = [["site", "Website", "M3 4h14v12H3z M3 8h14"], ["projects", "Projects", "M3 5h6l2 2h6v9H3z"], ["tone", "Tone of voice", "M4 15V5h12v8H8z"], ["brand", "Guides", "M10 3l2 4 4 1-3 3 1 4-4-2-4 2 1-4-3-3 4-1z"], ["refs", "References", "M8 12l4-4M6 14l-1 1a2 2 0 0 1-3-3l3-3a2 2 0 0 1 3 0M14 6l1-1a2 2 0 0 1 3 3l-3 3a2 2 0 0 1-3 0"], ["widgets", "Widgets", "M3 3h6v6H3z M11 3h6v6h-6z M3 11h6v6H3z M11 11h6v6h-6z"], ["posts", "Posts", "M4 4h12v9H8l-4 3z"], ["stats", "Analytics", "M3 16h14M5 13V9M9 13V5M13 13V8M17 13V3"]];
 
   const docs = {}; let loaded = false, saveT = {};
   async function load() {
@@ -63,7 +63,7 @@
   // ---- side menu ----
   const ICON = Object.fromEntries(VIEWS.map(([id, , d]) => [id, d]));
   ICON.plan = "M3 5h14v12H3z M3 9h14 M7 3v4 M13 3v4"; ICON.posts = "M5 15l1-4 7-7 3 3-7 7z M12 5l3 3";
-  const GROUPS = [["Site", [["site", "Website"], ["projects", "Projects"]]], ["Content", [["posts", "Create"], ["plan", "Plan"], ["stats", "Analytics"]]], ["Brand", [["brand", "Guides"], ["tone", "Tone of voice"], ["refs", "References"]]]];
+  const GROUPS = [["Site", [["site", "Website"], ["projects", "Projects"], ["widgets", "Widgets"]]], ["Content", [["posts", "Create"], ["plan", "Plan"], ["stats", "Analytics"]]], ["Brand", [["brand", "Guides"], ["tone", "Tone of voice"], ["refs", "References"]]]];
   function renderSide() {
     const s = X.state;
     $("#st-side").innerHTML = GROUPS.map(([g, items]) => `<div class="st-sgroup"><div class="st-ssec">${esc(g)}</div>${items.map(([id, name]) => `<button class="st-sitem ${s.view === id ? "on" : ""}" data-view="${id}" title="${esc(name)}" ${s.view === id ? 'aria-current="page"' : ""}><svg viewBox="0 0 20 20"><path d="${ICON[id] || ""}"/></svg><span>${esc(name)}</span></button>`).join("")}</div>`).join("");
@@ -115,6 +115,17 @@
       <h2 class="st-gh" id="g-design">Design rules</h2><p class="st-m st-gp">For the website, the Studio, posts and anything else that carries the name.</p>${rules("design")}
       <h2 class="st-gh" id="g-content">Content rules</h2><p class="st-m st-gp">What we write and show, and in what order. Posts and AI drafts follow these too.</p>${rules("content")}`;
   }
+  // ---- widgets: the little cards in the corners of the home page. Settings live in the version (site.widgets) and publish with it. ----
+  const WDEF = { clock: { name: "Clock", note: "An analog clock on Berlin time.", fields: [["label", "Label under the time"]] }, weather: { name: "Weather", note: "The sky over Berlin right now, drawn. Temperature and conditions from Open-Meteo, no account needed.", fields: [["label", "Label (leave empty for the live condition)"]] }, stats: { name: "Worm stats", note: "Snacks eaten, distance crawled and time awake, counted live while someone watches.", fields: [] }, now: { name: "Now", note: "One line you set here: what you're listening to, making or thinking about.", fields: [["text", "The line"], ["label", "Small label"]] } };
+  const CORNERS = [["tl", "Top left"], ["tr", "Top right"], ["bl", "Bottom left"], ["br", "Bottom right"]];
+  function viewWidgets() {
+    const V = X.V(); V.site.widgets = V.site.widgets || {}; const W = V.site.widgets;
+    return `<div class="st-vh"><h1>Widgets</h1><p>Small live cards in the corners of the home page. Switch them on, pick a corner, set the text. They publish with the site.</p></div>
+      <div class="st-wgrid">${Object.entries(WDEF).map(([id, d]) => { const w = W[id] || (W[id] = { on: false, corner: "br" }); return `<section class="st-wcard ${w.on !== false ? "on" : ""}">
+        <header><label class="st-switch"><input type="checkbox" data-won="${id}" ${w.on !== false ? "checked" : ""}><span></span></label><div><h2>${esc(d.name)}</h2><p class="st-m">${esc(d.note)}</p></div></header>
+        <div class="st-wfields"><label class="st-field"><span>Corner</span><select class="st-in" data-wcorner="${id}">${CORNERS.map(([k, n]) => `<option value="${k}" ${w.corner === k ? "selected" : ""}>${n}</option>`).join("")}</select></label>
+        ${d.fields.map(([k, n]) => `<label class="st-field"><span>${esc(n)}</span><input class="st-in" data-wfield="${id}.${k}" value="${esc(w[k] || "")}"></label>`).join("")}</div></section>`; }).join("")}</div>`;
+  }
   function viewRefs() {
     const d = docs.refs.data, id = "refs";
     const items = d.items.map((r, i) => ({ r, i }));
@@ -139,13 +150,14 @@
     site.hidden = true; box.hidden = false;
     if (v === "posts" || v === "plan") { box.innerHTML = ""; if (window.HSP) window.HSP.render(box); return; }
     if (v === "stats") { box.innerHTML = ""; if (window.HSA) window.HSA.analytics(box); return; }
-    box.innerHTML = `<div class="st-vwrap">${v === "projects" ? viewProjects() : v === "tone" ? viewTone() : v === "brand" ? viewBrand() : viewRefs()}</div>`;
+    box.innerHTML = `<div class="st-vwrap">${v === "projects" ? viewProjects() : v === "tone" ? viewTone() : v === "brand" ? viewBrand() : v === "widgets" ? viewWidgets() : viewRefs()}</div>`;
     box.querySelectorAll("textarea.st-doc").forEach(grow);
   }
 
   // ---- events ----
   document.addEventListener("input", e => {
     const el = e.target;
+    if (el.matches("[data-wfield]")) { const [id, k] = el.dataset.wfield.split("."); X.V().site.widgets[id][k] = el.value; X.V().updatedAt = new Date().toISOString(); mark("Saving…"); X.scheduleSave(); return; }
     if (el.matches("[data-doc][data-path]")) {
       const id = el.dataset.doc, d = docs[id].data; let val = el.value; if (el.classList.contains("st-doc")) grow(el);
       setPath(d, el.dataset.path, val); mark("Saving…"); save(id);
@@ -164,6 +176,8 @@
   });
   document.addEventListener("change", e => {
     const el = e.target;
+    if (el.matches("[data-won]")) { const id = el.dataset.won; X.change(() => { X.V().site.widgets[id].on = el.checked; }); el.closest(".st-wcard").classList.toggle("on", el.checked); return; }
+    if (el.matches("[data-wcorner]")) { const id = el.dataset.wcorner; X.change(() => { X.V().site.widgets[id].corner = el.value; }); return; }
     if (el.matches("[data-case][type=checkbox]")) { const i = +el.dataset.case; X.change(() => { X.V().cases[i].hidden = el.checked; }); el.closest(".st-proj").classList.toggle("hid", el.checked); }
   });
   document.addEventListener("click", async e => {

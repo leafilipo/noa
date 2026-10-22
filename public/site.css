@@ -396,9 +396,22 @@ body[data-device="phone"] .hs { position: relative; } body[data-device="phone"] 
 .nf-nav .nf-pill, .nf-where { pointer-events: auto; }
 .nf-where { justify-self: end; color: var(--mut); font-variant-numeric: tabular-nums; }
 /* a small live counter in the bottom right: what he has eaten */
-.nf-count, .nf-date { position: absolute; bottom: var(--pad); font-size: 14px; color: var(--mut); pointer-events: none; font-variant-numeric: tabular-nums; }
-.nf-count { right: var(--pad); }
-.nf-date { left: var(--pad); }
+/* corner widgets: small paper cards, ink lines */
+.nf-w { position: absolute; z-index: 6; display: flex; align-items: center; gap: 12px; padding: 10px 14px 10px 12px; border-radius: 14px; background: color-mix(in srgb, #FFFFFF 22%, var(--bg)); box-shadow: 0 1px 0 color-mix(in srgb, var(--ink) 10%, transparent), 0 14px 30px rgba(0,0,0,.08); font-size: 13px; line-height: 1.25; pointer-events: none; font-variant-numeric: tabular-nums; }
+.hs.dark .nf-w { background: color-mix(in srgb, #FFFFFF 6%, var(--bg)); }
+.nf-w-tl { left: var(--pad); top: 76px; } .nf-w-tr { right: var(--pad); top: 76px; } .nf-w-bl { left: var(--pad); bottom: var(--pad); } .nf-w-br { right: var(--pad); bottom: var(--pad); }
+.nf-w-t { display: flex; flex-direction: column; gap: 2px; }
+.nf-w-t b { font-weight: 500; font-size: 14px; }
+.nf-w-t i { font-style: normal; color: var(--mut); font-size: 12px; }
+.nf-clock, .nf-sky { width: 40px; height: 40px; flex: none; }
+.nf-sky .nf-cloud, .nf-sky .nf-rain { opacity: 0; transition: opacity .6s; }
+.nf-sky .nf-sun { transform-origin: 24px 24px; animation: nf-spin 60s linear infinite; }
+.is-cloud .nf-sky .nf-cloud, .is-rain .nf-sky .nf-cloud { opacity: 1; } .is-cloud .nf-sky .nf-sun, .is-rain .nf-sky .nf-sun { opacity: .35; transform: translate(6px, -8px) scale(.7); } .is-rain .nf-sky .nf-rain { opacity: 1; }
+.nf-w-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--sky); flex: none; animation: nf-pulse 2.4s ease-in-out infinite; }
+@keyframes nf-spin { to { transform: rotate(360deg); } } @keyframes nf-pulse { 50% { opacity: .35; } }
+@media (prefers-reduced-motion: reduce) { .nf-sky .nf-sun, .nf-w-dot { animation: none; } }
+.st-editing .nf-w { pointer-events: auto; }
+@container hs (max-width: 720px) { .nf-w { padding: 8px 12px 8px 10px; } .nf-w-tl, .nf-w-tr { top: 64px; } .nf-w-bl, .nf-w-br { bottom: 92px; } }
 .nf-pill { position: relative; display: flex; gap: 4px; padding: 4px; border-radius: 999px; background: color-mix(in srgb, #FFFFFF 16%, var(--bg)); isolation: isolate; }
 .hs.dark .nf-pill { background: color-mix(in srgb, #FFFFFF 4%, var(--bg)); }
 /* the dark blob slides under the hovered tab and eases back to the current page */
