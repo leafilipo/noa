@@ -20,7 +20,7 @@
   // gallery placeholders until real images: soft gradients in the site's inks and skies
   const GRAD = ["linear-gradient(160deg,#1E63D8,#A9D2F7)", "linear-gradient(20deg,#1A1A1A,#5E5B55)", "radial-gradient(circle at 30% 30%,#FFFFFF,#A9D2F7 60%,#1E63D8)", "linear-gradient(200deg,#F3F1EA,#C9C3BB)", "linear-gradient(135deg,#1B3FA0,#1E63D8 50%,#A9D2F7)", "radial-gradient(circle at 70% 70%,#5E5B55,#1A1A1A)", "linear-gradient(90deg,#DCD8D3,#1E63D8)", "conic-gradient(from 200deg,#A9D2F7,#1E63D8,#1B3FA0,#A9D2F7)", "linear-gradient(180deg,#1A1A1A 40%,#DCD8D3 40%)", "radial-gradient(circle at 50% 100%,#F3F1EA,#DCD8D3 50%,#C9C3BB)", "linear-gradient(240deg,#1E63D8,#1A1A1A)"];
   // the worm's face, for the home tab
-  const FACE = `<svg class="nf-face-svg" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10.5" fill="none" stroke="currentColor" stroke-width="1.5"/><ellipse cx="8.6" cy="9.6" rx=".95" ry="1.35" fill="currentColor"/><ellipse cx="15.4" cy="9.6" rx=".95" ry="1.35" fill="currentColor"/><path d="M8 13.2a4.4 4.4 0 0 0 8 0" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><ellipse cx="12.8" cy="16.6" rx="1.3" ry="1.6" fill="currentColor"/></svg>`;
+  const FACE = `<svg class="nf-face-svg" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10.5" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="8.3" cy="12" r="1.5" fill="currentColor"/><circle cx="15.3" cy="9.6" r="1.5" fill="currentColor"/><g transform="translate(13.4 15.2) rotate(-28)"><ellipse rx="3.6" ry="1.9" fill="currentColor"/><ellipse cx=".6" cy="2" rx="1.1" ry="1.4" fill="var(--bg,#DCD8D3)" stroke="currentColor" stroke-width=".9"/></g></svg>`;
   function make(V, opts) {
     const E = !!(opts && opts.edit);
     const f = (path, tag, cls, attrs) => { const v = get(V, path); return `<${tag || "span"} class="${cls || ""}" data-f="${esc(path)}"${attrs || ""}>${esc(v)}</${tag || "span"}>`; };
@@ -438,11 +438,13 @@
       for (let q = pts.length - 1; q >= 0; q--) { ctx.beginPath(); ring(q); ctx.fill(); ctx.stroke(); }
       const hp = pts[0];
       if (hp) { const r = hp.r, cx = hp.x + Math.cos(head.a) * r * .18, cy = hp.y + Math.sin(head.a) * r * .18;
-        if (t > nextBlink + .16) nextBlink = t + 2 + Math.random() * 5; const bl = t > nextBlink;
-        ctx.fillStyle = ink; ctx.lineWidth = 1.5 * k;
-        for (const s of [-1, 1]) { const ex = cx + s * r * .32, ey = cy - r * .22; if (bl) { ctx.beginPath(); ctx.moveTo(ex - r * .1, ey); ctx.lineTo(ex + r * .1, ey); ctx.stroke(); } else { ctx.beginPath(); ctx.ellipse(ex, ey, r * .09, r * .13, 0, 0, 7); ctx.fill(); } }
-        ctx.beginPath(); ctx.arc(cx, cy + r * .05, r * .36, .15 * Math.PI, .85 * Math.PI); ctx.stroke();
-        ctx.beginPath(); ctx.ellipse(cx + r * .08 + Math.sin(t * 7) * r * .06, cy + r * .48, r * .13, r * (chasing ? .5 : .3) * .45, .2, 0, 7); ctx.fill(); }
+        // the face: two dot eyes, a filled open mouth with a little tongue (the drawing)
+        ctx.fillStyle = ink;
+        for (const s of [-1, 1]) { ctx.beginPath(); ctx.arc(cx + s * r * .3 + (s < 0 ? r * .02 : 0), cy - r * (s < 0 ? .08 : .24), r * .13, 0, 7); ctx.fill(); }
+        ctx.save(); ctx.translate(cx + r * .12, cy + r * .3); ctx.rotate(-.5);
+        ctx.beginPath(); ctx.ellipse(0, 0, r * .33, r * .17, 0, 0, 7); ctx.fill();
+        const tw = chasing ? Math.sin(t * 9) * .15 : 0; ctx.fillStyle = paper; ctx.beginPath(); ctx.ellipse(r * .06, r * .19 + tw * r, r * .1, r * .13, .1, 0, 7); ctx.fill();
+        ctx.strokeStyle = ink; ctx.lineWidth = 1.2 * k; ctx.stroke(); ctx.restore(); }
       raf = requestAnimationFrame(step);
     }
     raf = requestAnimationFrame(step); creatures.push({ stop: () => cancelAnimationFrame(raf) });
