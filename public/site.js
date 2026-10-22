@@ -368,7 +368,7 @@
     const cv = root.querySelector("canvas"), card = root.querySelector(".nf-fg"), cap = root.querySelector(".nf-cap > span");
     if (!cv || cv.dataset.on) return; cv.dataset.on = "1";
     const ctx = cv.getContext("2d"), reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
-    let W = 0, H = 0, k = 1, N = 360, head = null, trail = [], snacks = [], eaten = 0, gulp = -9, nextBlink = 2, raf = 0, pts = [];
+    let W = 0, H = 0, k = 1, N = 520, head = null, trail = [], snacks = [], eaten = 0, gulp = -9, nextBlink = 2, raf = 0, pts = [];
     const m = { x: 0, y: 0, at: -1e9 }, edit = !!root.closest(".st-editing"), base = cap ? cap.textContent : "";
     const col = n => getComputedStyle(root).getPropertyValue(n).trim();
     function fit() {
@@ -377,7 +377,7 @@
       if (!head) { head = { x: W * .3, y: H * .5, a: 0 }; trail = []; for (let i = 0; i < 4000; i++) trail.push({ x: head.x - Math.sin(i * .004) * W * .25, y: head.y + Math.sin(i * .007) * H * .25 }); }
     }
     const ro = new ResizeObserver(fit); ro.observe(root); fit();
-    const radius = (i, n) => { const T = 30 * k, u = i / n; if (u < .62) return T; return T * Math.pow(1 - (u - .62) / .38, 1.15) + 2 * k; };
+    const radius = (i, n) => { const T = 30 * k, u = i / n; if (u < .1) return T * (.72 + .28 * u / .1); if (u < .6) return T; return T * Math.pow(1 - (u - .6) / .4, 1.2) + 2 * k; };
     const pos = e => { const r = cv.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; };
     cv.addEventListener("pointermove", e => { const q = pos(e); m.x = q.x; m.y = q.y; m.at = performance.now(); });
     cv.addEventListener("click", e => {
@@ -398,12 +398,12 @@
       if (!reduce) {
         const want = Math.atan2(ty - head.y, tx - head.x); let da = want - head.a; while (da > Math.PI) da -= Math.PI * 2; while (da < -Math.PI) da += Math.PI * 2;
         const dist = Math.hypot(tx - head.x, ty - head.y), sp = (chasing ? 3.6 : 2.1) * k * Math.min(1, dist / (80 * k) + .3);
-        head.a += Math.max(-.032, Math.min(.032, da)); head.x += Math.cos(head.a) * sp; head.y += Math.sin(head.a) * sp;
-        if (Math.hypot(head.x - trail[0].x, head.y - trail[0].y) > .8) trail.unshift({ x: head.x, y: head.y }); if (trail.length > 14000) trail.length = 14000;
+        head.a += Math.max(-.026, Math.min(.026, da)) + Math.sin(t * .9) * .004; head.x += Math.cos(head.a) * sp; head.y += Math.sin(head.a) * sp;
+        if (Math.hypot(head.x - trail[0].x, head.y - trail[0].y) > .8) trail.unshift({ x: head.x, y: head.y }); if (trail.length > 20000) trail.length = 20000;
       }
       pts = []; let acc = 0, need = 0, i = 0;
       for (let j = 1; j < trail.length && i < N; j++) { const a = trail[j - 1], b = trail[j], seg = Math.hypot(b.x - a.x, b.y - a.y);
-        while (acc + seg >= need && i < N) { const f = (need - acc) / (seg || 1), r = radius(i, N); pts.push({ x: a.x + (b.x - a.x) * f, y: a.y + (b.y - a.y) * f, r }); i++; need += r < 9 * k ? r * 1.9 : Math.max(3 * k, r * .2); } acc += seg; }
+        while (acc + seg >= need && i < N) { const f = (need - acc) / (seg || 1), r = radius(i, N); pts.push({ x: a.x + (b.x - a.x) * f, y: a.y + (b.y - a.y) * f, r }); i++; need += r < 11 * k ? r * 2 : Math.max(4.5 * k, r * .22); } acc += seg; }
       ctx.clearRect(0, 0, W, H);
       for (const s of snacks) { const w = 1 + Math.sin(t * 6 + s.b) * .15; ctx.fillStyle = ink; ctx.beginPath(); ctx.arc(s.x, s.y, 5 * k * w, 0, 7); ctx.fill(); ctx.strokeStyle = ink; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(s.x, s.y, 11 * k * w, 0, 7); ctx.stroke(); }
       ctx.lineWidth = 1.5 * k; ctx.strokeStyle = ink;
