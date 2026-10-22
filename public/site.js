@@ -383,11 +383,11 @@
     const cv = root.querySelector("canvas"), card = root.querySelector(".nf-fg"), cap = root.querySelector(".nf-cap > span");
     if (!cv || cv.dataset.on) return; cv.dataset.on = "1";
     const ctx = cv.getContext("2d"), reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
-    let W = 0, H = 0, k = 1, N = 520, head = null, trail = [], snacks = [], eaten = 0, gulp = -9, nextBlink = 2, raf = 0, pts = [];
+    let W = 0, H = 0, k = 1, N = 380, head = null, trail = [], snacks = [], eaten = 0, gulp = -9, nextBlink = 2, raf = 0, pts = [];
     const m = { x: 0, y: 0, at: -1e9 }, edit = !!root.closest(".st-editing"), base = cap ? cap.textContent : "";
     const col = n => getComputedStyle(root).getPropertyValue(n).trim();
     function fit() {
-      const r = root.getBoundingClientRect(), d = devicePixelRatio || 1; W = r.width; H = r.height; if (!W || !H) return;
+      const r = root.getBoundingClientRect(), d = Math.min(devicePixelRatio || 1, 1.5); W = r.width; H = r.height; if (!W || !H) return;
       cv.width = W * d; cv.height = H * d; ctx.setTransform(d, 0, 0, d, 0, 0); k = Math.max(.55, Math.min(1.2, Math.min(W / 1440, H / 860)));
       if (!head) { head = { x: W * .3, y: H * .5, a: 0 }; trail = []; for (let i = 0; i < 4000; i++) trail.push({ x: head.x - Math.sin(i * .004) * W * .25, y: head.y + Math.sin(i * .007) * H * .25 }); }
     }
@@ -423,12 +423,19 @@
       }
       pts = []; let acc = 0, need = 0, i = 0;
       for (let j = 1; j < trail.length && i < N; j++) { const a = trail[j - 1], b = trail[j], seg = Math.hypot(b.x - a.x, b.y - a.y);
-        while (acc + seg >= need && i < N) { const f = (need - acc) / (seg || 1), r = radius(i, N); pts.push({ x: a.x + (b.x - a.x) * f, y: a.y + (b.y - a.y) * f, r }); i++; need += r < 11 * k ? r * 2 : Math.max(4.5 * k, r * .22); } acc += seg; }
+        while (acc + seg >= need && i < N) { const f = (need - acc) / (seg || 1), r = radius(i, N), x = a.x + (b.x - a.x) * f, y = a.y + (b.y - a.y) * f;
+          // dynamic spacing: rings pack tighter where the body bends (the rings on the inside of a curve almost touch)
+          const prev = pts[i - 1]; let bend = 0; if (prev && prev.a != null) { const ang = Math.atan2(y - prev.y, x - prev.x); let d = ang - prev.a; while (d > Math.PI) d -= Math.PI * 2; while (d < -Math.PI) d += Math.PI * 2; bend = Math.min(1, Math.abs(d) * 6); }
+          pts.push({ x, y, r, a: prev ? Math.atan2(y - prev.y, x - prev.x) : head.a }); i++;
+          const base = r < 11 * k ? r * 2 : Math.max(5.5 * k, r * .26); need += r < 11 * k ? base : base * (1.4 - bend * .8); } acc += seg; }
       ctx.clearRect(0, 0, W, H);
       for (const s of snacks) { const w = 1 + Math.sin(t * 6 + s.b) * .15; ctx.fillStyle = ink; ctx.beginPath(); ctx.arc(s.x, s.y, 5 * k * w, 0, 7); ctx.fill(); ctx.strokeStyle = ink; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(s.x, s.y, 11 * k * w, 0, 7); ctx.stroke(); }
       ctx.lineWidth = 1.5 * k; ctx.strokeStyle = ink;
       const gf = Math.max(0, 1 - (t - gulp) * 1.2), bulge = gf > 0 ? (1 - gf) * pts.length : -999;
-      for (let q = pts.length - 1; q >= 0; q--) { const p = pts[q], bump = 1 + Math.max(0, 1 - Math.abs(q - bulge) / 8) * .35; ctx.fillStyle = paper; ctx.beginPath(); ctx.arc(p.x, p.y, p.r * bump, 0, 7); ctx.fill(); ctx.stroke(); }
+      // Safari: one path per ring is slow. Rings only overlap their neighbours, so draw in two passes of batched paths (odd, then even): fill all, stroke all.
+      ctx.fillStyle = paper;
+      const ring = (q) => { const p = pts[q], bump = 1 + Math.max(0, 1 - Math.abs(q - bulge) / 8) * .35; ctx.moveTo(p.x + p.r * bump, p.y); ctx.arc(p.x, p.y, p.r * bump, 0, 7); };
+      for (let q = pts.length - 1; q >= 0; q--) { ctx.beginPath(); ring(q); ctx.fill(); ctx.stroke(); }
       const hp = pts[0];
       if (hp) { const r = hp.r, cx = hp.x + Math.cos(head.a) * r * .18, cy = hp.y + Math.sin(head.a) * r * .18;
         if (t > nextBlink + .16) nextBlink = t + 2 + Math.random() * 5; const bl = t > nextBlink;
