@@ -163,7 +163,7 @@ async function servePage(env, path, origin) {
   if (!p) { p = await env.DB.prepare("SELECT path, title, descr, html FROM release_pages WHERE release = ? AND path = '/404'").bind(rel).first(); status = 404; }
   if (!p) return new Response("Not found", { status: 404 });
   const canon = origin + (p.path === "/" ? "/" : p.path);
-  const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  const html = `<!doctype html><html lang="en" class="hs-pub"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>${escH(p.title)}</title><meta name="description" content="${escH(p.descr)}"><link rel="canonical" href="${escH(canon)}">
 <meta property="og:title" content="${escH(p.title)}"><meta property="og:description" content="${escH(p.descr)}"><meta property="og:url" content="${escH(canon)}"><meta property="og:type" content="website"><meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="preload" href="/fonts/geist-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
