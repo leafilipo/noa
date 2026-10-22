@@ -92,7 +92,12 @@
     stage.scrollTop = keepScroll ? y : 0;
     stuck();
     site.querySelectorAll("[data-estimate]").forEach(r => window.HS.estimate(r));
-    window.HS.creatures.splice(0).forEach(c => c.stop()); site.querySelectorAll("[data-creature]").forEach(r => window.HS.creature(r)); site.querySelectorAll("[data-gallery]").forEach(r => window.HS.gallery(r));
+    window.HS.creatures.splice(0).forEach(c => c.stop()); site.querySelectorAll("[data-creature]").forEach(r => window.HS.creature(r));
+    site.querySelectorAll(".nf-pill").forEach(pill => { const blob = document.createElement("span"); blob.className = "nf-blob"; pill.prepend(blob);
+      const to = a => { if (!a) { blob.style.width = "0"; return; } blob.style.left = a.offsetLeft + "px"; blob.style.width = a.offsetWidth + "px"; };
+      const home = () => { pill.querySelectorAll("a").forEach(x => x.classList.remove("lit")); to(pill.querySelector("a.on")); };
+      pill.querySelectorAll("a").forEach(a => a.addEventListener("pointerenter", () => { pill.querySelectorAll("a").forEach(x => x.classList.remove("lit")); a.classList.add("lit"); to(a); }));
+      pill.addEventListener("pointerleave", home); blob.style.transition = "none"; home(); requestAnimationFrame(() => blob.style.transition = ""); }); site.querySelectorAll("[data-gallery]").forEach(r => window.HS.gallery(r));
     site.querySelectorAll("[data-bench]").forEach(g => { const path = g.closest("[data-sec]").dataset.sec + ".items"; window.HS.bench(g, {
       onGo: href => { if (!state.edit) go(href); },
       onOrder: ids => change(() => { const arr = get(V(), path); const next = ids.map(i => arr[i]); arr.splice(0, arr.length, ...next); }, true),

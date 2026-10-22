@@ -28,7 +28,8 @@
 }
 .hs.dark { --bg: #121212; --card: #1D1D1C; --card-2: #282826; --tint: #2A2927; --ink: #E8E6E1; --ink-2: #CFCCC5; --mut: #8E8B85; --line: rgba(232, 230, 225, .14); --accent: #7FB6FF; --sky: #1E63D8; }
 
-.hs-pub { margin: 0; background: #DCD8D3; }
+.hs-pub { margin: 0; background: #DCD8D3; height: 100svh; overflow: hidden; }
+.hs-pub > .hs { height: 100svh; overflow: auto; overscroll-behavior: contain; }
 .hs-pub:has(.hs.dark) { background: #121212; }
 .hs { container: hs / inline-size; background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 15px; line-height: 1.35; -webkit-font-smoothing: antialiased; min-height: 100%; padding: var(--gap) var(--pad) var(--pad); display: flex; flex-direction: column; gap: var(--gap); transition: background .3s, color .3s; }
 .hs *, .hs *::before, .hs *::after { box-sizing: border-box; }
@@ -397,11 +398,13 @@ body[data-device="phone"] .hs { position: relative; } body[data-device="phone"] 
 /* a small live counter in the bottom right: what he has eaten */
 .nf-count { position: absolute; right: var(--pad); bottom: var(--pad); font-size: 14px; color: var(--mut); pointer-events: none; opacity: 0; transition: opacity .4s; }
 .nf-count.on { opacity: 1; }
-.nf-pill { display: flex; gap: 4px; padding: 4px; border-radius: 999px; background: color-mix(in srgb, #FFFFFF 42%, var(--bg)); }
-.hs.dark .nf-pill { background: color-mix(in srgb, #FFFFFF 8%, var(--bg)); }
-.nf-pill a { padding: 9px 18px; border-radius: 999px; transition: background .25s, color .25s; }
-.nf-pill a:hover { background: color-mix(in srgb, #FFFFFF 35%, transparent); }
-.nf-pill a.on { background: var(--ink); color: var(--bg); }
+.nf-pill { position: relative; display: flex; gap: 4px; padding: 4px; border-radius: 999px; background: color-mix(in srgb, #FFFFFF 16%, var(--bg)); isolation: isolate; }
+.hs.dark .nf-pill { background: color-mix(in srgb, #FFFFFF 4%, var(--bg)); }
+/* the dark blob slides under the hovered tab and eases back to the current page */
+.nf-pill .nf-blob { position: absolute; top: 4px; left: 0; height: calc(100% - 8px); width: 0; border-radius: 999px; background: var(--ink); z-index: -1; transition: left .45s cubic-bezier(.3, 1.1, .3, 1), width .45s cubic-bezier(.3, 1.1, .3, 1); }
+.nf-pill a { padding: 9px 18px; border-radius: 999px; transition: color .3s; position: relative; }
+.nf-pill a.on, .nf-pill a.lit { color: var(--bg); }
+.nf-pill:hover a.on:not(.lit) { color: var(--ink); }
 .nf-pill a.nf-face { display: inline-grid; place-items: center; padding: 6px 12px; }
 .nf-pill a.nf-face > span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
 .nf-face-svg { width: 22px; height: 22px; display: block; }

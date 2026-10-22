@@ -7,6 +7,16 @@
     const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } }), { rootMargin: "0px 0px -6% 0px", threshold: .05 });
     rv.forEach(el => io.observe(el));
   } else rv.forEach(el => el.classList.add("in"));
+  // nav pill: a blob that slides under the hovered tab and settles back on the current page
+  document.querySelectorAll(".nf-pill").forEach(pill => {
+    const blob = document.createElement("span"); blob.className = "nf-blob"; pill.prepend(blob);
+    const to = a => { if (!a) { blob.style.width = "0"; return; } blob.style.left = a.offsetLeft + "px"; blob.style.width = a.offsetWidth + "px"; };
+    const home = () => { pill.querySelectorAll("a").forEach(x => x.classList.remove("lit")); to(pill.querySelector("a.on")); };
+    pill.querySelectorAll("a").forEach(a => a.addEventListener("pointerenter", () => { pill.querySelectorAll("a").forEach(x => x.classList.remove("lit")); a.classList.add("lit"); to(a); }));
+    pill.addEventListener("pointerleave", home);
+    requestAnimationFrame(() => { blob.style.transition = "none"; home(); requestAnimationFrame(() => blob.style.transition = ""); });
+    if (document.fonts) document.fonts.ready.then(home);
+  });
   // tabs
   document.querySelectorAll("[data-tabs]").forEach(bar => bar.addEventListener("click", e => {
     const t = e.target.closest("[data-tab]"); if (!t) return;
