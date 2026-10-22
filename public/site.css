@@ -401,8 +401,8 @@ body[data-device="phone"] .hs { position: relative; } body[data-device="phone"] 
 .nf-pill a:hover { background: var(--card); }
 .nf-pill a.on { background: var(--ink); color: var(--bg); }
 .hs-sec-creature { margin-top: calc(-1 * (var(--gap) + 52px)); margin-inline: calc(-1 * var(--pad)); }
-.nf-creature { position: relative; height: max(560px, 100svh); cursor: crosshair; }
-.st-stage .nf-creature { height: max(560px, 86vh); }
+.nf-creature { position: relative; height: 100svh; min-height: 420px; cursor: crosshair; }
+.st-stage .nf-creature { height: calc(100cqh - 1px); }
 .nf-creature canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: manipulation; }
 .nf-cap { position: absolute; left: var(--pad); right: var(--pad); bottom: var(--pad); display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; font-family: var(--mono); font-size: 13px; pointer-events: none; }
 .nf-cap-r { color: var(--mut); }
@@ -442,6 +442,12 @@ body[data-device="phone"] .hs { position: relative; } body[data-device="phone"] 
 .nf-hello { background: var(--sky); color: #FFFFFF; border-radius: 24px; padding: clamp(28px, 4cqi, 56px); display: flex; flex-direction: column; gap: 14px; margin-block: clamp(24px, 4cqi, 64px); }
 .nf-hello-t { font-size: clamp(36px, 4cqi, 56px); font-weight: 600; letter-spacing: -.025em; line-height: 1; }
 .nf-hello-a { align-self: flex-start; font-size: clamp(18px, 1.8cqi, 24px); text-decoration: underline !important; text-underline-offset: 6px; text-decoration-thickness: 2px; }
+.nf-home { display: contents; }
+.nf-home .nf-foot { display: none; }
+.hs:has(.nf-home) { height: 100svh; min-height: 420px; padding-bottom: 0 !important; overflow: hidden; }
+.hs:has(.nf-home) .hs-main { min-height: 0; }
+.hs:has(.nf-home) .hs-sec-creature { flex: 1; min-height: 0; margin-top: calc(-1 * (var(--gap) + 52px)); margin-bottom: calc(-1 * var(--pad)); }
+.hs:has(.nf-home) .nf-creature { height: 100%; min-height: 0; }
 .nf-foot { display: flex; flex-wrap: wrap; gap: 8px 20px; align-items: center; padding-top: 18px; margin-top: clamp(32px, 5cqi, 80px); border-top: 1.5px solid var(--ink); font-family: var(--mono); font-size: 12.5px; }
 .nf-grow { flex: 1; }
 .nf-theme { font: inherit; background: none; border: 0; color: inherit; cursor: pointer; padding: 0; }

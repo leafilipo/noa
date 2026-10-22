@@ -561,5 +561,8 @@ span.st-pil { cursor: default; height: 18px; font-size: 10.5px; padding: 0 7px 0
 @media (max-width: 640px) { .st-phead-r { margin-left: 0; width: 100%; padding: 4px 0 10px; } .st-phead-r .st-primary { margin-left: auto; } .st-cmp { padding: 18px 16px 12px; } .st-qview { margin-left: 0; } }
 
 /* the phone preview is its own scroll viewport: full-height sections and the bottom nav measure against it */
-body[data-device="phone"] .st-stage > .hs .nf-creature { height: 100%; min-height: 0; }
-body[data-device="phone"] .st-stage > .hs .nf-pill-bottom { position: sticky; }
+
+body[data-device="phone"] .st-stage > .hs { container: hs / size; transform: translateZ(0); }
+body[data-device="phone"] .st-stage > .hs:has(.nf-home) { height: var(--ph-h); }
+.st-stage > .hs:has(.nf-home) { height: 100%; }
+.st-stage { container: stage / size; }

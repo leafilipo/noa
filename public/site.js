@@ -223,7 +223,8 @@
       const key = Object.keys(V.pages).find(k => V.pages[k].path === route);
       if (!key) return null;
       const pg = V.pages[key];
-      return { kind: "page", key, title: pg.title || V.site.name, desc: pg.desc || "", html: nav(route) + `<main class="hs-main">${list(`pages.${key}.sections`)}</main>` + foot() };
+      const home = (pg.sections || []).some(x => x.t === "creature") && (pg.sections || []).length === 1;
+      return { kind: "page", key, title: pg.title || V.site.name, desc: pg.desc || "", html: (home ? `<div class="nf-home">` : "") + nav(route) + `<main class="hs-main">${list(`pages.${key}.sections`)}</main>` + foot() + (home ? `</div>` : "") };
     }
     return { page };
   }
