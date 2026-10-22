@@ -274,7 +274,7 @@
     sections: [{ t: "image", img: "", caption: "" }, { t: "pair", a: "", b: "" }, { t: "facts", items: [{ k: "Medium", v: "[code, 3D, motion]" }, { k: "Year", v: "2026" }] }] });
   const SEED = {
     name: "V1",
-    site: { name: "noa", navStyle: "noa", email: "lea@huit.studio", city: "Berlin", tz: "Europe/Berlin", nav: [{ label: "work", href: "/" }, { label: "about", href: "/about" }, { label: "gallery", href: "/gallery" }],
+    site: { name: "lea filipo", navStyle: "noa", email: "lea@huit.studio", city: "Berlin", tz: "Europe/Berlin", nav: [{ label: "work", href: "/" }, { label: "about", href: "/about" }, { label: "gallery", href: "/gallery" }],
       consent: { on: true, text: "This site sets no tracking cookies. It counts page views without identifying you.", accept: "Fine", decline: "No counting", more: "/cookies", moreLabel: "Cookies" },
       social: [{ label: "Instagram", href: "https://www.instagram.com/" }, { label: "X", href: "https://x.com/" }] },
     pages: {
@@ -377,7 +377,7 @@
       if (!head) { head = { x: W * .3, y: H * .5, a: 0 }; trail = []; for (let i = 0; i < 4000; i++) trail.push({ x: head.x - Math.sin(i * .004) * W * .25, y: head.y + Math.sin(i * .007) * H * .25 }); }
     }
     const ro = new ResizeObserver(fit); ro.observe(root); fit();
-    const radius = (i, n) => { const T = 30 * k, u = i / n; if (i < 16) return T * (.58 + i * .026); if (u < .62) return T; return T * Math.pow(1 - (u - .62) / .38, 1.15) + 2 * k; };
+    const radius = (i, n) => { const T = 30 * k, u = i / n; if (u < .62) return T; return T * Math.pow(1 - (u - .62) / .38, 1.15) + 2 * k; };
     const pos = e => { const r = cv.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; };
     cv.addEventListener("pointermove", e => { const q = pos(e); m.x = q.x; m.y = q.y; m.at = performance.now(); });
     cv.addEventListener("click", e => {

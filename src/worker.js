@@ -166,7 +166,7 @@ async function servePage(env, path, origin) {
   const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>${escH(p.title)}</title><meta name="description" content="${escH(p.descr)}"><link rel="canonical" href="${escH(canon)}">
 <meta property="og:title" content="${escH(p.title)}"><meta property="og:description" content="${escH(p.descr)}"><meta property="og:url" content="${escH(canon)}"><meta property="og:type" content="website"><meta name="twitter:card" content="summary_large_image">
-<link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="preload" href="/fonts/inter-tight-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="preload" href="/fonts/geist-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/_site.css?r=${rel}"></head><body class="hs-pub"><div class="hs">${p.html}</div><script src="/site.js" defer></script><script src="/_site.js" defer></script></body></html>`;
   return new Response(html, { status, headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=60", "x-content-type-options": "nosniff", "referrer-policy": "strict-origin-when-cross-origin" } });
 }
