@@ -36,6 +36,7 @@
   document.querySelectorAll("[data-bench]").forEach(g => window.HS && window.HS.bench(g));
   document.querySelectorAll("[data-gallery]").forEach(r => window.HS && window.HS.gallery(r));
   document.querySelectorAll("[data-creature]").forEach(r => window.HS && window.HS.creature(r));
+  document.querySelectorAll("[data-date]").forEach(d => { try { d.textContent = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "Europe/Berlin" }).format(new Date()).toLowerCase(); } catch (e) {} });
   document.querySelectorAll("[data-estimate]").forEach(r => window.HS && window.HS.estimate(r));
   // cookie banner: show once, remember the answer; "No counting" switches the view counter off in this browser
   let consent = null; try { consent = localStorage.getItem("hs-consent"); } catch (e) {}

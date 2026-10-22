@@ -396,8 +396,9 @@ body[data-device="phone"] .hs { position: relative; } body[data-device="phone"] 
 .nf-nav .nf-pill, .nf-where { pointer-events: auto; }
 .nf-where { justify-self: end; color: var(--mut); font-variant-numeric: tabular-nums; }
 /* a small live counter in the bottom right: what he has eaten */
-.nf-count { position: absolute; right: var(--pad); bottom: var(--pad); font-size: 14px; color: var(--mut); pointer-events: none; opacity: 0; transition: opacity .4s; }
-.nf-count.on { opacity: 1; }
+.nf-count, .nf-date { position: absolute; bottom: var(--pad); font-size: 14px; color: var(--mut); pointer-events: none; font-variant-numeric: tabular-nums; }
+.nf-count { right: var(--pad); }
+.nf-date { left: var(--pad); }
 .nf-pill { position: relative; display: flex; gap: 4px; padding: 4px; border-radius: 999px; background: color-mix(in srgb, #FFFFFF 16%, var(--bg)); isolation: isolate; }
 .hs.dark .nf-pill { background: color-mix(in srgb, #FFFFFF 4%, var(--bg)); }
 /* the dark blob slides under the hovered tab and eases back to the current page */
@@ -407,7 +408,8 @@ body[data-device="phone"] .hs { position: relative; } body[data-device="phone"] 
 .nf-pill:hover a.on:not(.lit) { color: var(--ink); }
 .nf-pill a.nf-face { display: inline-grid; place-items: center; padding: 6px 12px; }
 .nf-pill a.nf-face > span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
-.nf-face-svg { width: 22px; height: 22px; display: block; }
+.nf-face-svg { width: 24px; height: 24px; display: block; --face-ink: var(--ink); --face-paper: #E7E1DE; }
+.hs.dark .nf-face-svg { --face-ink: #1A1A1A; --face-paper: #E7E1DE; }
 .st-editing .nf-pill a.nf-face > span { position: static; width: auto; height: auto; clip: auto; margin-left: 8px; }
 .hs-sec-creature { margin-top: calc(-1 * (var(--gap) + 52px)); margin-inline: calc(-1 * var(--pad)); }
 .nf-creature { position: relative; height: 100svh; min-height: 420px; cursor: crosshair; }
