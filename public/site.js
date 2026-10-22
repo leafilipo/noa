@@ -143,7 +143,7 @@
         return `<div class="nf-creature" data-creature="${esc(s.kind || "worm")}"><canvas aria-label="${esc(c.name || "A creature")} crawling across the page"></canvas>
           <aside class="nf-fg" ${E ? "" : "hidden"} aria-label="Field guide"><p class="nf-lab">Field guide · ${f(p + ".card.no", "span")}</p>${f(p + ".card.name", "h2", "nf-fg-name")}${f(p + ".card.latin", "p", "nf-fg-latin")}
             <dl>${row("habitat", "Habitat")}${row("behaviour", "Behaviour")}${row("diet", "Diet")}${row("observed", "First observed")}${row("status", "Status")}</dl>${fm(p + ".card.note", "nf-fg-note")}${E ? "" : `<button type="button" class="nf-fg-x" data-fgclose aria-label="Close field guide">×</button>`}</aside>
-          ${s.caption || s.hint || E ? `<div class="nf-cap">${f(p + ".caption", "span")}<span class="nf-cap-r">${f(p + ".hint", "span")}</span></div>` : ""}</div>`; },
+          ${s.caption || s.hint || E ? `<div class="nf-cap">${f(p + ".caption", "span")}<span class="nf-cap-r">${f(p + ".hint", "span")}</span></div>` : ""}<span class="nf-count" aria-live="polite"></span></div>`; },
       // ---- noa: specimens, the work as field guide cards ----
       specimens: (p, s) => { const list = (V.cases || []).map((c, i) => ({ c, i })).filter(x => !x.c.hidden || E);
         return `${(get(V, p + ".title") || E) ? `<div class="nf-head">${f(p + ".title", "h2", "nf-h2")}${(get(V, p + ".intro") || E) ? f(p + ".intro", "p", "nf-intro") : ""}</div>` : ""}
@@ -380,7 +380,7 @@
   // ---- noa: the worm. Stacked outlined circles on paper, follows attention, eats what you drop, opens his field guide when you click his head. ----
   const creatures = [];
   function creature(root) {
-    const cv = root.querySelector("canvas"), card = root.querySelector(".nf-fg"), cap = root.querySelector(".nf-cap > span");
+    const cv = root.querySelector("canvas"), card = root.querySelector(".nf-fg"), cap = root.querySelector(".nf-cap > span"), cnt = root.querySelector(".nf-count");
     if (!cv || cv.dataset.on) return; cv.dataset.on = "1";
     const ctx = cv.getContext("2d"), reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
     let W = 0, H = 0, k = 1, N = 380, head = null, trail = [], snacks = [], eaten = 0, gulp = -9, nextBlink = 2, raf = 0, pts = [];
@@ -407,7 +407,7 @@
       const ink = col("--ink") || "#1A1A1A", paper = col("--bg") || "#DCD8D3";
       let tx, ty, chasing = false;
       if (snacks.length) { let best = null, bd = 1e9; for (const s of snacks) { const d = Math.hypot(s.x - head.x, s.y - head.y); if (d < bd) { bd = d; best = s; } } tx = best.x; ty = best.y; chasing = true;
-        if (bd < 22 * k) { snacks.splice(snacks.indexOf(best), 1); eaten++; N += 18; gulp = t; if (cap) cap.textContent = base.replace(/he is .*$/, "") + `he has eaten ${eaten} ${eaten === 1 ? "snack" : "snacks"}.`; } }
+        if (bd < 22 * k) { snacks.splice(snacks.indexOf(best), 1); eaten++; N += 18; gulp = t; if (cap) cap.textContent = base.replace(/he is .*$/, "") + `he has eaten ${eaten} ${eaten === 1 ? "snack" : "snacks"}.`; if (cnt) { cnt.textContent = `${eaten} ${eaten === 1 ? "snack" : "snacks"}`; cnt.classList.add("on"); } } }
       else if (ms - m.at < 2500) { tx = m.x; ty = m.y; }
       else { tx = W / 2 + Math.cos(t * .21) * W * .34 + Math.sin(t * .47) * W * .06; ty = H / 2 + Math.sin(t * .33) * H * .32 + Math.cos(t * .61) * H * .05; }
       if (!reduce) {

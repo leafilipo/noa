@@ -393,10 +393,14 @@ body[data-device="phone"] .hs { position: relative; } body[data-device="phone"] 
 .nf-nav { position: sticky; top: 0; z-index: 20; padding-block: var(--gap) 8px; pointer-events: none; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 12px; font-family: var(--mono); font-size: 13px; }
 .nf-name { justify-self: start; font-size: 15px; pointer-events: auto; }
 .nf-nav .nf-pill, .nf-where { pointer-events: auto; }
-.nf-where { justify-self: end; color: var(--mut); }
-.nf-pill { display: flex; gap: 4px; padding: 4px; border: 1.5px solid var(--ink); border-radius: 999px; background: var(--bg); }
+.nf-where { justify-self: end; color: var(--mut); font-variant-numeric: tabular-nums; }
+/* a small live counter in the bottom right: what he has eaten */
+.nf-count { position: absolute; right: var(--pad); bottom: var(--pad); font-size: 14px; color: var(--mut); pointer-events: none; opacity: 0; transition: opacity .4s; }
+.nf-count.on { opacity: 1; }
+.nf-pill { display: flex; gap: 4px; padding: 4px; border-radius: 999px; background: color-mix(in srgb, #FFFFFF 42%, var(--bg)); }
+.hs.dark .nf-pill { background: color-mix(in srgb, #FFFFFF 8%, var(--bg)); }
 .nf-pill a { padding: 9px 18px; border-radius: 999px; transition: background .25s, color .25s; }
-.nf-pill a:hover { background: var(--card); }
+.nf-pill a:hover { background: color-mix(in srgb, #FFFFFF 35%, transparent); }
 .nf-pill a.on { background: var(--ink); color: var(--bg); }
 .nf-pill a.nf-face { display: inline-grid; place-items: center; padding: 6px 12px; }
 .nf-pill a.nf-face > span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
