@@ -253,7 +253,7 @@
     // preview: links work like on the real site
     const a = c("a");
     if (a && !state.edit) { const href = a.getAttribute("href") || ""; if (href.startsWith("/")) go(href); else if (/^https?:|^mailto:/.test(href)) window.open(href, "_blank", "noopener"); }
-    else if (a && state.edit && !c("[contenteditable]")) { const href = a.getAttribute("href") || ""; if (href.startsWith("/") && c(".hs-menu, .hs-logo, .hs-next-in, .hs-back")) go(href); }
+    else if (a && state.edit && !c("[contenteditable]")) { const href = a.getAttribute("href") || ""; if (href.startsWith("/") && c(".hs-menu, .hs-logo, .hs-next-in, .hs-back, .nf-pill, .nf-name")) go(href); }
   });
 
   function pickImage(path) {
