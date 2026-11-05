@@ -23,6 +23,8 @@
   const FACE = `<svg class="nf-face-svg" viewBox="2.5 6 39.2 39.2" aria-hidden="true"><circle cx="22.1" cy="25.7" r="17.6" fill="var(--face-paper)" stroke="var(--face-ink)" stroke-width="2.2"/><path d="M27.7174 23.7114C26.2418 22.8594 25.7362 20.9725 26.5881 19.4969C27.4401 18.0213 29.3269 17.5157 30.8026 18.3677C32.2782 19.2196 32.7838 21.1065 31.9318 22.5821C31.0799 24.0577 29.193 24.5633 27.7174 23.7114Z" fill="var(--face-ink)" stroke="var(--face-paper)" stroke-width=".8"/><path d="M12.1812 25.2746C10.7056 24.4227 10.2 22.5358 11.0519 21.0602C11.9039 19.5846 13.7908 19.079 15.2664 19.9309C16.742 20.7829 17.2476 22.6698 16.3956 24.1454C15.5437 25.621 13.6568 26.1266 12.1812 25.2746Z" fill="var(--face-ink)" stroke="var(--face-paper)" stroke-width=".8"/><path d="M17.4697 36.7492C19.79 37.3657 26.0763 36.8022 28.6997 35.6185C31.323 34.4348 32.4335 32.8626 32.214 30.6769C32.1941 30.467 32.1567 30.2646 32.1036 30.0664C31.5024 27.7705 28.8015 26.7975 26.7797 28.0464C25.9714 28.5453 24.6107 29.1 22.3923 29.3227C20.1738 29.5453 18.7291 29.2756 17.8388 28.9467C15.6094 28.1269 13.1575 29.6169 13.0271 31.9886C13.0149 32.1931 13.0196 32.3987 13.0395 32.6086C13.259 34.7943 15.1494 36.1326 17.4697 36.7492Z" fill="var(--face-ink)" stroke="var(--face-paper)" stroke-width=".8"/><path d="M26.3859 35.6626C26.3859 35.6626 26.9382 39.372 23.7176 39.9023C20.4971 40.4326 18.1098 34.9759 20.4486 34.5142C26.8143 33.2557 26.3859 35.6626 26.3859 35.6626Z" fill="var(--face-paper)" stroke="var(--face-ink)" stroke-width="1.4"/><path d="M24.4268 33.8173C24.4268 33.8173 22.7355 33.608 23.0526 35.8766C23.1491 36.5495 23.1719 34.0892 22.0861 34.2516C21.0056 34.4125 20.6704 33.3284 20.6704 33.3284L24.4248 33.8206L24.4268 33.8173Z" fill="var(--face-ink)" stroke="var(--face-ink)" stroke-width=".8"/></svg>`;
   // the face (from FACE.svg): eyes, mouth, tongue. Coordinates are in the SVG's space, centred on the head disc at (22.1, 25.7), radius 17.6.
   const FACE_PATHS = [{ d: "M27.7174 23.7114C26.2418 22.8594 25.7362 20.9725 26.5881 19.4969C27.4401 18.0213 29.3269 17.5157 30.8026 18.3677C32.2782 19.2196 32.7838 21.1065 31.9318 22.5821C31.0799 24.0577 29.193 24.5633 27.7174 23.7114Z", f: "ink", s: "paper" }, { d: "M12.1812 25.2746C10.7056 24.4227 10.2 22.5358 11.0519 21.0602C11.9039 19.5846 13.7908 19.079 15.2664 19.9309C16.742 20.7829 17.2476 22.6698 16.3956 24.1454C15.5437 25.621 13.6568 26.1266 12.1812 25.2746Z", f: "ink", s: "paper" }, { d: "M17.4697 36.7492C19.79 37.3657 26.0763 36.8022 28.6997 35.6185C31.323 34.4348 32.4335 32.8626 32.214 30.6769C32.1941 30.467 32.1567 30.2646 32.1036 30.0664C31.5024 27.7705 28.8015 26.7975 26.7797 28.0464C25.9714 28.5453 24.6107 29.1 22.3923 29.3227C20.1738 29.5453 18.7291 29.2756 17.8388 28.9467C15.6094 28.1269 13.1575 29.6169 13.0271 31.9886C13.0149 32.1931 13.0196 32.3987 13.0395 32.6086C13.259 34.7943 15.1494 36.1326 17.4697 36.7492Z", f: "ink", s: "paper" }, { d: "M26.3859 35.6626C26.3859 35.6626 26.9382 39.372 23.7176 39.9023C20.4971 40.4326 18.1098 34.9759 20.4486 34.5142C26.8143 33.2557 26.3859 35.6626 26.3859 35.6626Z", f: "paper", s: "ink" }, { d: "M24.4268 33.8173C24.4268 33.8173 22.7355 33.608 23.0526 35.8766C23.1491 36.5495 23.1719 34.0892 22.0861 34.2516C21.0056 34.4125 20.6704 33.3284 20.6704 33.3284L24.4248 33.8206L24.4268 33.8173Z", f: "ink", s: "ink" }];
+  // the glasses mark from leafilipo.com: two frames, pupils that follow the cursor, a bridge and a nose
+  const GLASSES = `<svg viewBox="0 0 85 54" aria-hidden="true"><circle cx="19.5" cy="19.5" r="17" fill="none" stroke="currentColor" stroke-width="5"/><circle cx="65.5" cy="19.5" r="17" fill="none" stroke="currentColor" stroke-width="5"/><circle class="nf-pupil" cx="19.5" cy="19.5" r="13" fill="currentColor"/><circle class="nf-pupil" cx="65.5" cy="19.5" r="13" fill="currentColor"/><rect x="36" y="17" width="14" height="6" fill="currentColor"/><path transform="translate(45 34.5) rotate(60) translate(-15.195 -10.76)" d="M0 0L30.3901 5.4968L21.1389 21.5203L16.9953 19.128L22.4953 9.60174L0 5.16746V0Z" fill="currentColor"/></svg>`;
   function make(V, opts) {
     const E = !!(opts && opts.edit);
     // editor markers (data-f, data-fm, data-href) only in edit mode; the published HTML stays clean
@@ -189,6 +191,12 @@
             <input name="website" class="hs-hp" tabindex="-1" autocomplete="off">
             <div class="nf-form-foot"><button type="submit" class="nf-btn">${f(p + ".button", "span")}</button><p class="hs-form-msg nf-mut" aria-live="polite"></p></div>
           </form></div>`,
+      // ---- prelaunch (V0): the glasses mark, a short bio, link pills. A bare page, no nav or footer. ----
+      prelaunch: (p, s) => { const bio = (get(V, p + ".body") || []), lw = s.linkWord, lh = s.linkHref;
+        const bioHtml = E ? fm(p + ".body", "nf-pre-bio") : `<div class="nf-pre-bio">${bio.map(t => `<p>${lw && lh && t.includes(lw) ? esc(t).replace(esc(lw), `<a href="${esc(lh)}" target="_blank" rel="noopener">${esc(lw)}</a>`) : esc(t)}</p>`).join("")}</div>`;
+        return `<div class="nf-pre"><div class="nf-pre-mark" data-glasses aria-label="${esc(V.site.name)}" role="img">${GLASSES}</div>${bioHtml}
+          <nav class="nf-pre-links" aria-label="Links">${items(p + ".links", (q, i, l) => (l && l.href) && !E ? `<a class="nf-pre-pill" href="${esc(l.href)}"${/^https?:/.test(l.href) ? ' target="_blank" rel="noopener"' : ""}>${esc(l.label)}</a>` : `<span class="nf-pre-pill" ${E ? `data-href="${esc(q)}.href"` : ""}><span ${E ? `data-f="${esc(q)}.label"` : ""}>${esc(l.label)}</span></span>`, "plink", "nf-pre-i")}</nav>
+          ${E ? `<p class="st-paneh hs-tiny hs-mut">Linked word in the bio: <span data-f="${esc(p)}.linkWord">${esc(lw || "")}</span> → <span data-f="${esc(p)}.linkHref">${esc(lh || "")}</span></p>` : ""}</div>`; },
       legal: (p, s) => `<div class="hs-card hs-textcard">${f(p + ".title", "h1", "hs-h2")}${fm(p + ".body", "hs-body hs-legal")}</div>`
     };
 
@@ -251,6 +259,7 @@
       const key = Object.keys(V.pages).find(k => V.pages[k].path === route);
       if (!key) return null;
       const pg = V.pages[key];
+      if (pg.bare) return { kind: "page", key, title: pg.title || V.site.name, desc: pg.desc || "", html: `<main class="hs-main nf-bare">${list(`pages.${key}.sections`)}</main>` + consent() };
       const home = (pg.sections || []).some(x => x.t === "creature") && (pg.sections || []).length === 1;
       return { kind: "page", key, title: pg.title || V.site.name, desc: pg.desc || "", html: (home ? `<div class="nf-home">` : "") + nav(route) + `<main class="hs-main">${list(`pages.${key}.sections`)}</main>` + foot() + (home ? `</div>` : "") };
     }
@@ -285,6 +294,7 @@
     profile: { name: "Profile", note: "Statement and labelled lists", make: () => ({ t: "profile", statement: ["A short statement."], rows: [{ k: "Label", items: [{ label: "Item", href: "" }] }] }) },
     gallery: { name: "Gallery", note: "Everything in one grid with filters", make: () => ({ t: "gallery", items: [{ title: "Untitled", kind: "snapshot", year: "2026", img: "", href: "" }] }) },
     write: { name: "Write to me", note: "A short contact form; messages land in the Inbox", make: () => ({ t: "write", label: "Contact", title: "Would you still hire me if I was a worm?", button: "Send" }) },
+    prelaunch: { name: "Prelaunch", note: "The glasses, a short bio and link pills, alone on the page", make: () => ({ t: "prelaunch", body: ["A short bio."], linkWord: "", linkHref: "", links: [{ label: "Email", href: "mailto:" }] }) },
     legal: { name: "Legal text", note: "Imprint, privacy", make: () => ({ t: "legal", title: "Title", body: ["Text."] }) }
   };
   const ITEM = {
@@ -489,5 +499,15 @@
       try { const k = "nf-sky", c = JSON.parse(localStorage.getItem(k) || "null"); if (c && Date.now() - c.at < 15 * 60e3) show(c.code, c.temp); } catch (e) {}
       fetch("https://api.open-meteo.com/v1/forecast?latitude=52.52&longitude=13.405&current=temperature_2m,weather_code&timezone=Europe%2FBerlin").then(r => r.json()).then(d => { const code = d.current.weather_code, temp = d.current.temperature_2m; show(code, temp); try { localStorage.setItem("nf-sky", JSON.stringify({ at: Date.now(), code, temp })); } catch (e) {} }).catch(() => {}); }
   }
-  window.HS = { widgets, gallery, creature, creatures, make, LIB, ITEM, SEED, newCase, routes, get, esc, slugify, src, bench, estimate };
+  // glasses: pupils look toward the cursor (or drift slowly on touch screens)
+  function glasses(root) { root = root || document; const marks = [...root.querySelectorAll("[data-glasses]")]; if (!marks.length) return;
+    const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches; let mx = null, my = null, t0 = performance.now();
+    addEventListener("pointermove", e => { mx = e.clientX; my = e.clientY; }, { passive: true });
+    const look = (now) => { marks.forEach(m => { if (!m.isConnected) return; const r = m.getBoundingClientRect(), sc = r.width / 85;
+      m.querySelectorAll(".nf-pupil").forEach(pu => { const cx = r.left + (+pu.getAttribute("cx")) * sc, cy = r.top + 19.5 * sc;
+        let dx, dy; if (mx == null) { const a = (now - t0) / 2400; dx = Math.cos(a); dy = Math.sin(a * 1.3) * .6; } else { dx = mx - cx; dy = my - cy; const d = Math.hypot(dx, dy) || 1; const f = Math.min(1, d / 220); dx = dx / d * f; dy = dy / d * f; }
+        pu.setAttribute("transform", `translate(${(dx * 5).toFixed(2)} ${(dy * 3.5).toFixed(2)})`); }); });
+      if (!reduce) requestAnimationFrame(look); };
+    requestAnimationFrame(look); }
+  window.HS = { glasses, widgets, gallery, creature, creatures, make, LIB, ITEM, SEED, newCase, routes, get, esc, slugify, src, bench, estimate };
 })();

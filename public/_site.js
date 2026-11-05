@@ -37,6 +37,7 @@
   document.querySelectorAll("[data-gallery]").forEach(r => window.HS && window.HS.gallery(r));
   document.querySelectorAll("[data-creature]").forEach(r => window.HS && window.HS.creature(r));
   if (window.HS) window.HS.widgets(document);
+  if (window.HS) window.HS.glasses(document);
   document.querySelectorAll("[data-estimate]").forEach(r => window.HS && window.HS.estimate(r));
   // cookie banner: show once, remember the answer; "No counting" switches the view counter off in this browser
   let consent = null; try { consent = localStorage.getItem("hs-consent"); } catch (e) {}
